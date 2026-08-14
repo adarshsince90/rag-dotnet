@@ -1,0 +1,50 @@
+# Build
+bin/
+obj/
+
+# Test Results
+TestResults/
+
+# User files
+*.user
+*.suo
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+*.coverage
+
+# NuGet
+packages/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+
+# Docker
+docker-data/
+
+# Local AI / Models
+models/
+
+# Data outputs
+data/processed/*
+data/chunks/*
+data/embeddings/*
+
+# Keep folders
+!data/processed/.gitkeep
+!data/chunks/.gitkeep
+!data/embeddings/.gitkeep
