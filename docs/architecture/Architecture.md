@@ -56,3 +56,77 @@ IChunkProvider
 
 IRetriever
 → KeywordRetriever
+
+
+## Current Retrieval Architecture
+
+User
+↓
+API
+↓
+AskQuestionService
+↓
+IChunkProvider
+↓
+IRetriever
+↓
+RetrievalResponse
+↓
+Response DTOs
+↓
+API Response
+
+---
+
+## Retrieval Layer
+
+The retriever is responsible for:
+
+- Evaluating chunks
+- Calculating scores
+- Ranking results
+- Applying Top-K selection
+- Producing retrieval diagnostics
+
+The retriever is not responsible for:
+
+- HTTP concerns
+- User-facing messages
+- API formatting
+
+---
+
+## Current Retrieval Models
+
+DocumentChunk
+
+Contains:
+
+- Id
+- Content
+- Source
+- ChunkIndex
+
+RetrievalResult
+
+Contains:
+
+- Chunk
+- Score
+- Rank
+
+RetrievalResponse
+
+Contains:
+
+- Results
+- Diagnostics
+
+RetrievalDiagnostics
+
+Contains:
+
+- TotalChunks
+- QualifiedChunks
+- ReturnedChunks
+- TopK

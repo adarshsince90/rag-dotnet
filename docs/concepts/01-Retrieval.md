@@ -55,3 +55,48 @@ have related meaning but different words.
 Keyword retrieval struggles with this.
 
 Embedding-based retrieval solves this limitation.
+
+
+## Sprint 2 Implementation
+
+## Ranking
+
+Retrieval is not only about finding matches.
+
+Retrieval systems must rank candidate chunks according to relevance.
+
+Current implementation:
+
+Keyword score
+
+Future implementation:
+
+Vector similarity score
+
+---
+
+## Top-K Retrieval
+
+Instead of returning a single chunk, modern retrieval systems return multiple ranked chunks.
+
+Benefits:
+
+- More context
+- Better answer generation
+- Improved recall
+
+Current strategy:
+
+Top 3 chunks
+
+---
+
+## Retrieval Diagnostics
+
+Retrieval diagnostics provide visibility into:
+
+- Number of chunks processed
+- Number of matching chunks
+- Number of results returned
+
+Diagnostics help explain retrieval behavior and support troubleshooting.
