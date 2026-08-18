@@ -100,3 +100,55 @@ Retrieval diagnostics provide visibility into:
 - Number of results returned
 
 Diagnostics help explain retrieval behavior and support troubleshooting.
+
+
+## Retrieval Evolution
+
+Sprint 1
+
+Keyword Retrieval
+
+↓
+
+Sprint 3
+
+Semantic Retrieval
+
+---
+
+## Retrieval Types
+
+### Keyword Retrieval
+
+Pros:
+
+- Exact matching
+- Entity matching
+
+Cons:
+
+- No semantic understanding
+
+---
+
+### Vector Retrieval
+
+Pros:
+
+- Semantic understanding
+- Synonym handling
+
+Cons:
+
+- Can struggle with entity-heavy queries
+
+---
+
+### Hybrid Retrieval
+
+Combines:
+
+- Keyword Retrieval
+- Vector Retrieval
+
+to leverage strengths of both approaches.

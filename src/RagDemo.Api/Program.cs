@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Mvc;
 using RagDemo.Application.Dtos;
 using RagDemo.Application.Services;
 using RagDemo.Domain.Abstractions;
+using RagDemo.Domain.Interfaces;
+using RagDemo.Infrastructure.Documents;
+using RagDemo.Infrastructure.Embedding;
 using RagDemo.Infrastructure.Retrieval;
 using Scalar.AspNetCore;
 
@@ -10,16 +14,35 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
+builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IChunkProvider,
     TextFileChunkProvider>();
 
 builder.Services.AddScoped<IRetriever,
-    KeywordRetriever>();
+    VectorRetriever>();
+
+builder.Services.AddHttpClient<IEmbeddingGenerator,
+    OllamaEmbeddingGenerator>();
 
 builder.Services.AddScoped<AskQuestionService>();
 
-builder.Services.AddOpenApi();
+builder.Services.AddScoped<GenerateEmbeddingsService>();
+
+builder.Services.Configure<OllamaOptions>(
+    builder.Configuration.GetSection("Ollama"));
+
+builder.Services.Configure<DataOptions>(
+    builder.Configuration.GetSection("Data"));
+
+builder.Services.Configure<RetrievalOptions>(
+    builder.Configuration.GetSection("Retrieval"));
+
+builder.Services.AddSingleton<IChunkStore,
+    InMemoryChunkStore>();
+
+builder.Services.AddScoped<IRetrievalResultProcessor,
+    RetrievalResultProcessor>();
 
 var app = builder.Build();
 
@@ -69,6 +92,20 @@ async (
         cancellationToken);
 
     return Results.Ok(response);
+});
+
+app.MapPost("/embeddings/generate",
+    async (
+        [FromServices] GenerateEmbeddingsService service,
+        CancellationToken cancellationToken) =>
+{
+    var chunks = await service
+        .GenerateEmbeddingsAsync(cancellationToken);
+
+    return Results.Ok(new
+    {
+        Chunks = chunks.Count
+    });
 });
 
 app.Run();

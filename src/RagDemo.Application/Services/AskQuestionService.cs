@@ -33,6 +33,7 @@ public sealed class AskQuestionService
         //     question,
         //     match?.Chunk?.Content,
         //     match?.Score ?? 0);
+        // ---------------------------------------
 
         // var matches = await _retriever
         //     .RetrieveAsync(
@@ -44,8 +45,6 @@ public sealed class AskQuestionService
         var retrievalResponse =
             await _retriever.RetrieveAsync(
                 question,
-                chunks,
-                topK: 3,
                 cancellationToken: cancellationToken);
         
         var matches = retrievalResponse.Results

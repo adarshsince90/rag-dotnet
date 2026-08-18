@@ -16,9 +16,13 @@ public interface IRetriever
     //     int topK = 3,
     //     CancellationToken cancellationToken = default);
 
+    // Task<RetrievalResponse> RetrieveAsync(
+    //     string question,
+    //     IReadOnlyCollection<DocumentChunk> chunks,
+    //     int topK = 3,
+    //     CancellationToken cancellationToken = default);
+
     Task<RetrievalResponse> RetrieveAsync(
         string question,
-        IReadOnlyCollection<DocumentChunk> chunks,
-        int topK = 3,
         CancellationToken cancellationToken = default);
 }

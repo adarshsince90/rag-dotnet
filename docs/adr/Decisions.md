@@ -81,3 +81,66 @@ Future metadata:
 Reason
 
 Supports traceability, debugging, citations, and source attribution.
+
+## ADR-007
+
+Title
+
+Local AI Infrastructure Uses Ollama
+
+Decision
+
+Ollama will be used as the default provider for:
+
+- Embedding Generation
+- Chat Completion
+
+Reason
+
+- Open Source
+- Runs Locally
+- Supports Multiple Models
+- No API Cost
+- Compatible With Assignment Requirements
+
+## ADR-008
+
+Title
+
+Semantic Retrieval Uses Embeddings
+
+Decision
+
+Document chunks are converted into embeddings using an embedding model.
+
+Reason
+
+Semantic similarity provides better retrieval quality than exact keyword matching.
+
+## ADR-009
+
+Title
+
+Embeddings Stored In Memory
+
+Decision
+
+Generated embeddings are stored using InMemoryChunkStore.
+
+Reason
+
+Dataset size is small and no vector database is currently required.
+
+## ADR-010
+
+Title
+
+Retrieval Processing Centralized
+
+Decision
+
+Ranking, filtering and Top-K selection are handled by RetrievalResultProcessor.
+
+Reason
+
+Ensures consistent retrieval behavior across retriever implementations.

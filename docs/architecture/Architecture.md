@@ -130,3 +130,38 @@ Contains:
 - QualifiedChunks
 - ReturnedChunks
 - TopK
+
+## Embedding Architecture
+
+Document
+↓
+IChunkProvider
+↓
+DocumentChunk
+↓
+IEmbeddingGenerator
+↓
+Embedding Generation
+↓
+IChunkStore
+↓
+IRetriever
+↓
+Retrieval Results
+
+---
+
+## Current Infrastructure Components
+
+Embeddings
+
+- OllamaEmbeddingGenerator
+
+Storage
+
+- InMemoryChunkStore
+
+Retrieval
+
+- VectorRetriever
+- RetrievalResultProcessor
