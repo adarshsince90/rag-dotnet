@@ -33,6 +33,11 @@ Thumbs.db
 .env
 .env.*
 
+# Configuration
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
 # Docker
 docker-data/
 

@@ -165,3 +165,28 @@ Retrieval
 
 - VectorRetriever
 - RetrievalResultProcessor
+
+## Current RAG Architecture
+
+API
+↓
+QuestionAnsweringService
+
+├── IRetriever
+├── IPromptBuilder
+└── IChatCompletionService
+
+↓
+
+Infrastructure
+
+- VectorRetriever
+- OllamaEmbeddingGenerator
+- OllamaChatCompletionService
+
+↓
+
+Ollama
+
+- nomic-embed-text
+- gemma2:2b

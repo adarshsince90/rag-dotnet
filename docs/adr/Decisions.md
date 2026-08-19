@@ -144,3 +144,95 @@ Ranking, filtering and Top-K selection are handled by RetrievalResultProcessor.
 Reason
 
 Ensures consistent retrieval behavior across retriever implementations.
+
+# ADR-011
+
+Title
+
+Local Chat Completion Uses Ollama
+
+Status
+
+Accepted
+
+Decision
+
+Ollama is used for answer generation.
+
+Model:
+
+gemma2:2b
+
+Reason
+
+- Open Source
+- Runs Locally
+- No Usage Cost
+- Satisfies Assignment Requirements
+
+
+# ADR-012
+
+Title
+
+Prompt Construction Separated From LLM Provider
+
+Status
+
+Accepted
+
+Decision
+
+Prompt generation is implemented via:
+
+IPromptBuilder
+
+Reason
+
+Prompt construction is application logic, not infrastructure logic.
+
+Benefits
+
+- Provider independent
+- Reusable
+- Easier experimentation
+
+# ADR-013
+
+Title
+
+LLMs Must Use Retrieved Context
+
+Status
+
+Accepted
+
+Decision
+
+Prompts instruct the model to answer only from retrieved context.
+
+Reason
+
+Reduces hallucination risk and keeps answers grounded in project documents.
+
+# ADR-014
+
+Title
+
+Embeddings Generated At Startup
+
+Decision
+
+Embeddings are generated during application startup
+and stored in InMemoryChunkStore.
+
+Reason
+
+Current dataset is small.
+In-memory retrieval requires embeddings to be available.
+
+Future
+
+When a persistent vector database is introduced,
+embeddings will be generated during document ingestion
+rather than application startup.
