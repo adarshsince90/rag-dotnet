@@ -1,4 +1,4 @@
-using RagDemo.Domain.Abstractions;
+using RagDemo.Domain.Contracts;
 using RagDemo.Domain.Models;
 
 public sealed class OverlapChunkingStrategy

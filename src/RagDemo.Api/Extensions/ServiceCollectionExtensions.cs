@@ -1,9 +1,10 @@
 using RagDemo.Application.Prompts;
 using RagDemo.Application.Services;
-using RagDemo.Domain.Abstractions;
-using RagDemo.Domain.Interfaces;
+using RagDemo.Domain.Contracts;
 using RagDemo.Infrastructure.Documents;
+using RagDemo.Infrastructure.Documents.Extraction;
 using RagDemo.Infrastructure.Embedding;
+using RagDemo.Infrastructure.Storage;
 
 namespace RagDemo.Api.Extensions;
 
@@ -22,8 +23,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddInfrastructureServices(
         this IServiceCollection services)
     {
-        services.AddScoped<IChunkProvider,
-            TextFileChunkProvider>();
+        // services.AddScoped<IChunkProvider,
+        //     TextFileChunkProvider>();
 
         services.AddScoped<IRetriever,
             VectorRetriever>();
@@ -34,20 +35,38 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRetrievalResultProcessor,
             RetrievalResultProcessor>();
 
-        services.AddHttpClient<IEmbeddingGenerator,
-            OllamaEmbeddingGenerator>();
+        services.AddHttpClient<
+            IEmbeddingGenerator,
+            OllamaEmbeddingGenerator>(
+                client =>
+                {
+                    client.Timeout =
+                        TimeSpan.FromMinutes(10);
+                });
 
-        services.AddHttpClient<IChatCompletionService,
-            OllamaChatCompletionService>();
-        
+        services.AddHttpClient<
+            IChatCompletionService,
+            OllamaChatCompletionService>(
+                client =>
+                {
+                    client.Timeout =
+                        TimeSpan.FromMinutes(10);
+                });
+                
         services.AddScoped<IPromptBuilder,
             RagPromptBuilder>();
 
         // services.AddScoped<IChunkingStrategy,
         //     ParagraphChunkingStrategy>();
 
-        services.AddScoped<IChunkingStrategy,
+        services.AddSingleton<IChunkingStrategy,
             CharacterChunkingStrategy>();
+
+        services.AddSingleton<IDocumentExtractor, 
+            PdfDocumentExtractor>();
+
+        services.AddSingleton<IChunkProvider, 
+            PdfChunkProvider>();
 
         return services;
     }

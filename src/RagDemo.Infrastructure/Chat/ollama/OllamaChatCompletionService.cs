@@ -1,8 +1,6 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.Options;
-using RagDemo.Domain.Interfaces;
-using RagDemo.Domain.Models;
-
+using RagDemo.Domain.Contracts;
 public sealed class OllamaChatCompletionService
     : IChatCompletionService
 {

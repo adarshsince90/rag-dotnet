@@ -1,4 +1,4 @@
-using RagDemo.Domain.Interfaces;
+using RagDemo.Domain.Contracts;
 
 namespace RagDemo.Application.Prompts;
 

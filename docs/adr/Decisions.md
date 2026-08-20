@@ -306,4 +306,46 @@ Reason
 Reduce hallucinations and improve reliability.
 
 
-# ADR-019
+# ADR-019 : PDF Support
+
+## Status
+
+Accepted
+
+## Context
+
+The original implementation operated on text files only.
+
+The assignment requirements and future roadmap require support
+for PDF-based knowledge sources.
+
+## Decision
+
+Introduce:
+
+- IDocumentExtractor
+- PdfDocumentExtractor
+- PdfChunkProvider
+
+PdfChunkProvider remains responsible for producing chunks.
+
+PdfDocumentExtractor is responsible solely for PDF text extraction.
+
+## Consequences
+
+Benefits:
+
+- Separation of extraction from chunking.
+- Reuse of existing chunking strategies.
+- Reuse of embedding generation pipeline.
+- Reuse of retrieval pipeline.
+
+Tradeoffs:
+
+- Initial indexing time increased significantly due to embedding generation.
+
+Future work:
+
+- Persistent vector database.
+- Asynchronous document indexing.
+- Support for additional document formats.

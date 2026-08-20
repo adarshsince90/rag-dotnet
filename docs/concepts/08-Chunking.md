@@ -57,3 +57,23 @@ Overlap:
 ## Observations
 
 Chunking often impacts retrieval quality more than model selection.
+
+## PDF Chunking
+
+The existing chunking architecture was successfully reused for PDF documents.
+
+Process:
+
+1. Extract text from PDF files.
+2. Pass extracted text to configured chunking strategy.
+3. Generate DocumentChunk objects.
+4. Generate embeddings for chunks.
+
+No changes were required to:
+
+- Retrieval
+- Embedding generation
+- Prompt building
+- Question answering
+
+This validated that chunking was already abstracted correctly.

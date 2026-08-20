@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
-using RagDemo.Domain.Interfaces;
-
+using RagDemo.Domain.Contracts;
+using RagDemo.Domain.Models;
 public sealed class RetrievalResultProcessor
     : IRetrievalResultProcessor
 {

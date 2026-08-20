@@ -5,4 +5,6 @@ public sealed class DataOptions
     public string InputFolder { get; init; } = string.Empty;
 
     public string OutputFolder { get; init; } = string.Empty;
+
+    public string PdfDirectory { get; init; } = string.Empty;
 }

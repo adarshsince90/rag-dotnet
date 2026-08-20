@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
-using RagDemo.Domain.Abstractions;
+using RagDemo.Domain.Contracts;
+using RagDemo.Domain.Models;
 
 namespace RagDemo.Infrastructure.Retrieval;
 

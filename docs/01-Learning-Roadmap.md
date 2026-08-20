@@ -68,3 +68,27 @@
 
 ---
 
+Sprint 5A ✅
+Chunking Improvements
+
+Sprint 5B ✅
+PDF Support
+
+Sprint 6 
+Persistent Vector Storage (Qdrant)
+
+Sprint 7
+Conversation Memory (Assignment Requirement)
+
+Sprint 7B (Optional)
+Provider Abstraction (Ollama/Groq)
+
+Sprint 8
+Evaluation (RAGAS + 10 Question Suite)
+
+Sprint 9
+UI integration
+
+Sprint 10
+Production Hardening
+---

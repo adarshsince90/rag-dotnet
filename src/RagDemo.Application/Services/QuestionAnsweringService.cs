@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using RagDemo.Application.Services;
-using RagDemo.Domain.Interfaces;
+using RagDemo.Domain.Contracts;
 
 public sealed class QuestionAnsweringService
 {

@@ -1,8 +1,7 @@
 using RagDemo.Application.Dtos;
-using RagDemo.Domain.Abstractions;
+using RagDemo.Domain.Contracts;
 
 namespace RagDemo.Application.Services;
-
 public sealed class RetrievalService
 {
     private readonly IRetriever _retriever;

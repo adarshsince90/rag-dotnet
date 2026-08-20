@@ -190,3 +190,52 @@ Ollama
 
 - nomic-embed-text
 - gemma2:2b
+
+---
+## Sprint 5B
+
+The bottleneck of a RAG system is not always retrieval.
+
+For document-heavy systems:
+
+Document Processing
+  ↓
+Chunking
+  ↓
+Embedding Generation
+  ↓
+Storage
+
+often costs significantly more than query-time retrieval.
+
+This motivates persistent vector storage.
+
+### Architectural Validation
+
+Sprint 5B demonstrated the value of separation of concerns.
+
+Only the document acquisition layer changed:
+
+TXT
+↓
+TextFileChunkProvider
+
+became
+
+PDF
+↓
+PdfDocumentExtractor
+↓
+PdfChunkProvider
+
+The following components remained unchanged:
+
+- Chunking Strategies
+- Embedding Generation
+- InMemoryChunkStore
+- VectorRetriever
+- Prompt Builder
+- Question Answering Service
+- Chat Completion Service
+
+This validated that document ingestion was correctly isolated from retrieval and generation concerns.

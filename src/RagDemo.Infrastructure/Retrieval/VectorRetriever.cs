@@ -1,6 +1,5 @@
-using Microsoft.Extensions.Options;
-using RagDemo.Domain.Abstractions;
-using RagDemo.Domain.Interfaces;
+using RagDemo.Domain.Contracts;
+using RagDemo.Domain.Models;
 using RagDemo.Infrastructure.Retrieval;
 
 public sealed class VectorRetriever
