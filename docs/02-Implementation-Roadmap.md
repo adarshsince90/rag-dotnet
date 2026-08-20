@@ -213,3 +213,53 @@ RAG consists of multiple cooperating systems:
 - Generation
 
 A weakness in any stage impacts overall answer quality.
+
+# Sprint 04 Learnings
+
+## Retrieval Is More Important Than Expected
+
+Most answer quality issues were retrieval issues.
+
+## Chunking Is Critical
+
+Changing chunking produced larger improvements than changing models.
+
+## Not All Questions Are Equal
+
+Definition Questions
+
+What is BERT?
+
+↓
+
+Small Context
+
+Summary Questions
+
+Summarize Transformer Paper
+
+↓
+
+Large Context
+
+This suggests future need for dynamic retrieval strategies.
+
+## Semantic Search Tolerates Minor Errors
+
+Examples:
+
+✅ BERTs
+✅ BERTing
+✅ transfomers
+
+❌ BERTH
+
+## Generation Is The Current Bottleneck
+
+Retrieval:
+~100-200ms
+
+Generation:
+~20-40s
+
+Future streaming responses may improve user experience.

@@ -13,6 +13,9 @@ public static class OptionsExtensions
         services.Configure<RetrievalOptions>(
             configuration.GetSection("Retrieval"));
 
+        services.Configure<ChunkingOptions>(
+            configuration.GetSection("Chunking"));
+
         return services;
     }
 }

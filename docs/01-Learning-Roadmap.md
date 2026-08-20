@@ -52,7 +52,9 @@
 
 ✅ Sprint 4 - Retrieval Augmented Generation
 
-⬜ Sprint 5 - Chunking Improvements & PDF Support
+✅ Sprint 5A - Chunking Improvements & Retrieval Experiments
+
+⬜ Sprint 5B - PDF Support
 
 ⬜ Sprint 6 - Hybrid Retrieval
 
@@ -63,3 +65,6 @@
 ⬜ Sprint 9 - Evaluation & Observability
 
 ⬜ Sprint 10 - Production Hardening
+
+---
+

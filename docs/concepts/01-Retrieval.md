@@ -152,3 +152,51 @@ Combines:
 - Vector Retrieval
 
 to leverage strengths of both approaches.
+
+---
+
+## Retrieval Types
+
+Keyword Retrieval
+
+- Exact matching
+- Entity matching
+
+Vector Retrieval
+
+- Semantic similarity
+- Meaning-based retrieval
+
+Future
+
+Hybrid Retrieval
+
+Keyword Score
++
+Vector Score
+
+## Current Retrieval Configuration
+
+TopK = 3
+
+MinimumSimilarity = 0.50
+
+## Future Enhancements
+
+### Dynamic TopK
+
+Fact Question
+
+TopK = 3
+
+Explanation Question
+
+TopK = 5
+
+Summary Question
+
+TopK = 10
+
+### Query Classification
+
+Question intent determines retrieval strategy.

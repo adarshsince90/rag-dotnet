@@ -6,16 +6,17 @@ namespace RagDemo.Infrastructure.Documents;
 
 public sealed class TextFileChunkProvider : IChunkProvider
 {
-    // todo: make this configurable
-    // private const string FilePath = "../../data/raw/company-info.txt";
-    //private const string FolderPath = "../../data/raw/";
     private readonly string FolderPath = "../../data/raw/";
-    public TextFileChunkProvider(IOptions<DataOptions> options)
+    private readonly IChunkingStrategy _chunkingStrategy;
+    private readonly DataOptions _dataOptions;
+    public TextFileChunkProvider(IOptions<DataOptions> options, IChunkingStrategy chunkingStrategy)
     {
-        var dataOptions = options.Value;
-        if (!string.IsNullOrWhiteSpace(dataOptions.InputFolder))
+        _chunkingStrategy = chunkingStrategy;
+        _dataOptions = options.Value;
+        
+        if (!string.IsNullOrWhiteSpace(_dataOptions.InputFolder))
         {
-            FolderPath = dataOptions.InputFolder;
+            FolderPath = _dataOptions.InputFolder;
         }
         if (!Directory.Exists(FolderPath))
         {
@@ -60,18 +61,12 @@ public sealed class TextFileChunkProvider : IChunkProvider
         foreach(var file in files)
         {
             var text = await File.ReadAllTextAsync(file);
-            var chunks = CreateChunk(text, file);
+            var chunks = _chunkingStrategy.CreateChunks(text, Path.GetFileName(file));
             result.AddRange(chunks);
         }
         return result;
     }
 
-    /// <summary>
-    /// Creates a list of DocumentChunk objects from the given content and file path.
-    /// </summary>
-    /// <param name="content"></param>
-    /// <param name="filepath"></param>
-    /// <returns></returns>
     private static List<DocumentChunk> CreateChunk(string content, string filepath)
     {
          return content

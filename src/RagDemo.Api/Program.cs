@@ -24,6 +24,7 @@ app.UseHttpsRedirection();
 
 app.MapHealthChecks("/health");
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapDiagnosticEndpoints();
 app.MapRetrievalEndpoints();
 app.MapGenerateEmbeddingsEndpoints();

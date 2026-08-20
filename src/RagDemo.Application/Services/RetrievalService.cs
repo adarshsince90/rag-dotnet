@@ -3,25 +3,22 @@ using RagDemo.Domain.Abstractions;
 
 namespace RagDemo.Application.Services;
 
-public sealed class AskQuestionService
+public sealed class RetrievalService
 {
-    private readonly IChunkProvider _chunkProvider;
     private readonly IRetriever _retriever;
 
-    public AskQuestionService(
-        IChunkProvider chunkProvider,
+    public RetrievalService(
         IRetriever retriever)
     {
-        _chunkProvider = chunkProvider;
         _retriever = retriever;
     }
 
-    public async Task<AskQuestionResponse> AskAsync(
+    public async Task<RetrieveResponse> RetrieveAsync(
         string question,
         CancellationToken cancellationToken = default)
     {
-        var chunks = await _chunkProvider
-            .GetChunksAsync(cancellationToken);
+        // var chunks = await _chunkProvider
+        //     .GetChunksAsync(cancellationToken);
 
         // var match = await _retriever
         //     .RetrieveAsync(
@@ -29,7 +26,7 @@ public sealed class AskQuestionService
         //         chunks,
         //         cancellationToken);
 
-        // return new AskQuestionResponse(
+        // return new RetrieveResponse(
         //     question,
         //     match?.Chunk?.Content,
         //     match?.Score ?? 0);
@@ -63,7 +60,7 @@ public sealed class AskQuestionService
                 retrievalResponse.Diagnostics.ReturnedChunks,
                 retrievalResponse.Diagnostics.TopK);
 
-        return new AskQuestionResponse(
+        return new RetrieveResponse(
             question,
             diagnostics,
             matches);

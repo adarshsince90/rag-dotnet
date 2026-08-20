@@ -10,7 +10,7 @@ namespace RagDemo.Application.Dtos;
 //     string Question,
 //     IReadOnlyCollection<MatchResponse> Matches);
 
-public record AskQuestionResponse(
+public record RetrieveResponse(
     string Question,
     RetrievalDiagnosticsResponse Diagnostics,
     IReadOnlyCollection<MatchResponse> Matches);

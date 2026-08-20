@@ -1,5 +1,3 @@
-using RagDemo.Domain.Models;
-
 namespace RagDemo.Domain.Abstractions;
 
 public interface IRetriever

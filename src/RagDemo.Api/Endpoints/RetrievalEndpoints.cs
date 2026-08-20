@@ -9,10 +9,10 @@ public static class RetrievalEndpoints
         endpoints.MapPost("/retrieval/search",
             async (
             AskQuestionRequest request,
-            AskQuestionService service,
+            RetrievalService service,
             CancellationToken cancellationToken) =>
                 {
-                    var response = await service.AskAsync(
+                    var response = await service.RetrieveAsync(
                         request.Question,
                         cancellationToken);
 

@@ -4,12 +4,12 @@ using RagDemo.Domain.Interfaces;
 
 public sealed class QuestionAnsweringService
 {
-    private readonly AskQuestionService _retrievalService;
+    private readonly RetrievalService _retrievalService;
     private readonly IChatCompletionService _chatCompletionService;
     private readonly IPromptBuilder _promptBuilder;
 
     public QuestionAnsweringService(
-        AskQuestionService retrievalService,
+        RetrievalService retrievalService,
         IChatCompletionService chatCompletionService,
         IPromptBuilder promptBuilder)
     {
@@ -18,19 +18,32 @@ public sealed class QuestionAnsweringService
         _promptBuilder = promptBuilder;
     }
 
-    public async Task<QuestionAnswerResponse> AskAsync(
-    string question,
-    CancellationToken cancellationToken = default)
+    public async Task<QuestionAnswerResponse> AskAsync(string question, CancellationToken cancellationToken = default)
     {
         var retrievalStopwatch = Stopwatch.StartNew();
         
         var retrievalResponse =
             await _retrievalService
-                .AskAsync(
+                .RetrieveAsync(
                     question,
                     cancellationToken);
 
         retrievalStopwatch.Stop();
+
+        if (retrievalResponse.Matches == null || !retrievalResponse.Matches.Any())
+        {
+            return new QuestionAnswerResponse(
+                question,
+                "I could not find the answer in the provided documents.",
+                retrievalResponse.Diagnostics with
+                {
+                    RetrievalMs = retrievalStopwatch.ElapsedMilliseconds,
+                    GenerationMs = 0,
+                    TotalMs = (int)retrievalStopwatch.ElapsedMilliseconds,
+                    llmInvoked = false
+                },
+                Array.Empty<MatchResponse>());
+        }
 
         var generationStopwatch = Stopwatch.StartNew();
         var context = BuildContext(retrievalResponse.Matches);
@@ -48,20 +61,17 @@ public sealed class QuestionAnsweringService
 
         generationStopwatch.Stop();
         
-        var answerText = answer?.Trim() ?? string.Empty;
-        if (!retrievalResponse.Matches.Any())
-        {
-            answerText = "I could not find the answer in the provided documents.";
-        }
+        var answerText = answer?.Trim() ?? "I could not generate an answer.";
 
-       return new QuestionAnswerResponse(
+        return new QuestionAnswerResponse(
             question,
             answerText,
             retrievalResponse.Diagnostics with
             {
                 RetrievalMs = retrievalStopwatch.ElapsedMilliseconds,
                 GenerationMs = generationStopwatch.ElapsedMilliseconds,
-                TotalMs = (int)(retrievalStopwatch.ElapsedMilliseconds + generationStopwatch.ElapsedMilliseconds)
+                TotalMs = (int)(retrievalStopwatch.ElapsedMilliseconds + generationStopwatch.ElapsedMilliseconds),
+                llmInvoked = true
             },
             retrievalResponse.Matches);
     }

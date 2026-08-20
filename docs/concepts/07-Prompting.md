@@ -48,3 +48,31 @@ This encourages grounded responses.
 Prompt quality significantly influences answer quality.
 
 Prompting is a critical component of RAG systems.
+
+---
+
+## Current Prompt Flow
+
+Question
+↓
+Retrieved Context
+↓
+Prompt Builder
+↓
+LLM
+
+## Prompt Grounding
+
+Prompt includes:
+
+Answer only from provided context.
+
+If answer is unavailable, respond:
+
+"I could not find the answer in the provided documents."
+
+## Benefits
+
+- Reduced hallucination
+- Predictable behavior
+- Easier debugging

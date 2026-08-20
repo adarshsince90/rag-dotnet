@@ -13,7 +13,6 @@ public sealed class VectorRetriever
     public VectorRetriever(
         IEmbeddingGenerator embeddingGenerator,
         IChunkStore chunkStore,
-        IOptions<RetrievalOptions> retrievalOptions,
         IRetrievalResultProcessor retrievalResultProcessor)
     {
         _embeddingGenerator = embeddingGenerator;
@@ -93,10 +92,7 @@ public sealed class VectorRetriever
         }
 
         var questionEmbedding =
-            await _embeddingGenerator
-            .GenerateEmbeddingAsync(
-            question,
-            cancellationToken);
+            await _embeddingGenerator.GenerateEmbeddingAsync(question, cancellationToken);
 
         var results = chunks
             .Where(chunk => chunk.Embedding is not null)

@@ -236,3 +236,74 @@ Future
 When a persistent vector database is introduced,
 embeddings will be generated during document ingestion
 rather than application startup.
+
+# ADR-015
+
+Title
+
+Prompt Builder Abstraction
+
+Decision
+
+Prompt generation is separated from LLM infrastructure.
+
+Reason
+
+Prompting is application logic rather than provider logic.
+
+
+# ADR-016
+
+Title
+
+Embeddings Initialized During Startup
+
+Decision
+
+Embeddings are generated during startup and stored in-memory.
+
+Reason
+
+Small dataset size and simplified developer workflow.
+
+Future
+
+Vector DB will replace startup embedding generation.
+
+
+# ADR-017
+
+Title
+
+Character Based Chunking
+
+Decision
+
+Use CharacterChunkingStrategy.
+
+Configuration:
+
+ChunkSize = 1000
+ChunkOverlap = 200
+
+Reason
+
+Provided best balance between retrieval quality and chunk count during experiments.
+
+
+# ADR-018
+
+Title
+
+RAG Uses Grounded Prompting
+
+Decision
+
+LLM responses must be generated only from retrieved context.
+
+Reason
+
+Reduce hallucinations and improve reliability.
+
+
+# ADR-019

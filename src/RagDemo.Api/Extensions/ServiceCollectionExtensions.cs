@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationServices(
         this IServiceCollection services)
     {
-        services.AddScoped<AskQuestionService>();
+        services.AddScoped<RetrievalService>();
         services.AddScoped<GenerateEmbeddingsService>();
         services.AddScoped<QuestionAnsweringService>();
 
@@ -42,6 +42,12 @@ public static class ServiceCollectionExtensions
         
         services.AddScoped<IPromptBuilder,
             RagPromptBuilder>();
+
+        // services.AddScoped<IChunkingStrategy,
+        //     ParagraphChunkingStrategy>();
+
+        services.AddScoped<IChunkingStrategy,
+            CharacterChunkingStrategy>();
 
         return services;
     }
