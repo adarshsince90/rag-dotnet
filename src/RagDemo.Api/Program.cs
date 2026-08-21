@@ -30,7 +30,7 @@ app.MapRetrievalEndpoints();
 app.MapGenerateEmbeddingsEndpoints();
 app.MapQuestionEndpoints();
 
-// await StartupTasks.InitializeAsync(app.Services);
+await StartupTasks.InitializeAsync(app.Services);
 
 app.Run();
 

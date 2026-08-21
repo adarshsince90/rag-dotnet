@@ -61,3 +61,18 @@ Question Embedding
 Similarity Comparison
 ↓
 Relevant Chunks
+
+
+## Important Observation
+
+Embedding generation is usually the most expensive
+part of document indexing.
+
+Observed:
+
+629 chunks
+↓
+~575 seconds
+
+Embedding generation is an indexing concern,
+not a retrieval concern.

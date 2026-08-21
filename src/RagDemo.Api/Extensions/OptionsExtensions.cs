@@ -1,3 +1,5 @@
+using RagDemo.Infrastructure.Storage.Qdrant;
+
 public static class OptionsExtensions
 {
     public static IServiceCollection AddOptionsConfiguration(
@@ -14,7 +16,11 @@ public static class OptionsExtensions
             configuration.GetSection("Retrieval"));
 
         services.Configure<ChunkingOptions>(
-            configuration.GetSection("Chunking"));
+            configuration.GetSection(ChunkingOptions.SchemaName));
+
+        services.Configure<QdrantOptions>(
+            configuration.GetSection(QdrantOptions.SectionName));
+
 
         return services;
     }

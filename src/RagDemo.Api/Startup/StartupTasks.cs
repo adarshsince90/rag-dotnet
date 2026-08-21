@@ -14,17 +14,15 @@ public static class StartupTasks
                 .CreateLogger("Startup");
 
         logger.LogInformation(
-            "Generating embeddings...");
+            "Initializing vector store...");
 
-        var embeddingService =
+        var vectorStore =
             scope.ServiceProvider
-                .GetRequiredService<GenerateEmbeddingsService>();
+                .GetRequiredService<IVectorStore>();
 
-        var chunks =
-            await embeddingService.GenerateEmbeddingsAsync();
+            await vectorStore.InitializeAsync();
 
         logger.LogInformation(
-            "Generated embeddings for {ChunkCount} chunks.",
-            chunks.Count);
+            "Vector store initialized.");
     }
 }

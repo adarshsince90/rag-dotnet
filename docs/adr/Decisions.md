@@ -349,3 +349,69 @@ Future work:
 - Persistent vector database.
 - Asynchronous document indexing.
 - Support for additional document formats.
+
+# ADR-020
+# Introduce Persistent Vector Storage Through Qdrant
+
+Status
+
+Accepted
+
+---
+
+## Context
+
+The application originally relied upon InMemoryChunkStore.
+
+Embeddings were regenerated during application startup.
+
+As document volume increased, indexing five PDF documents required approximately ten minutes.
+
+A persistent vector database was required.
+
+---
+
+## Decision
+
+Introduce Qdrant as the primary vector storage engine.
+
+Implementation:
+
+- IVectorStore
+- QdrantVectorStore
+
+Store:
+
+- Embeddings
+- Chunk Content
+- Metadata
+
+Persist vectors independently of application lifecycle.
+
+---
+
+## Consequences
+
+Benefits:
+
+- Persistent storage
+- Faster startup
+- Scalability
+- Metadata support
+- Future filtering support
+
+Tradeoffs:
+
+- Additional infrastructure dependency
+- Vector database operational complexity
+
+---
+
+## Future Opportunities
+
+- Metadata filtering
+- Collection statistics
+- Hybrid Retrieval
+- Dynamic Search Limit
+- Query Classification
+- Agentic Retrieval

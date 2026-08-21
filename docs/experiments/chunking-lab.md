@@ -119,3 +119,51 @@ Observation:
 Increasing corpus size did not significantly impact retrieval latency.
 
 The primary scalability concern shifted from retrieval to embedding generation.
+
+
+## Sprint 6 Findings
+
+### Vector Database Validation
+
+Qdrant retrieval was compared against the original in-memory cosine similarity implementation.
+
+Observations:
+
+- Same retrieval ranking
+- Same TopK matches
+- Nearly identical similarity scores
+
+Conclusion:
+
+Qdrant retrieval preserves retrieval quality while providing persistence and scalability.
+
+---
+
+### Retrieval Performance
+
+Observed:
+
+Retrieval:
+70-250 ms
+
+Generation:
+20-40 seconds
+
+Conclusion:
+
+Generation remains the dominant runtime bottleneck.
+
+Vector search is no longer a significant contributor to end-user latency.
+
+---
+
+### Future Retrieval Improvements
+
+Identified opportunities:
+
+- SearchLimit > TopK
+- Query Classification
+- Dynamic TopK
+- Dynamic SearchLimit
+- Hybrid Retrieval
+- Metadata Filtering

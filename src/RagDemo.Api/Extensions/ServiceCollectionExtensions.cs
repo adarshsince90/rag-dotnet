@@ -68,6 +68,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IChunkProvider, 
             PdfChunkProvider>();
 
+        services.AddSingleton<IVectorStore,
+            QdrantVectorStore>();
+
         return services;
     }
 }

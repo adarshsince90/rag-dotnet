@@ -239,3 +239,44 @@ The following components remained unchanged:
 - Chat Completion Service
 
 This validated that document ingestion was correctly isolated from retrieval and generation concerns.
+
+---
+
+## Vector Database Layer
+
+Sprint 6 introduced Qdrant as the vector database.
+
+Architecture:
+
+Question
+↓
+VectorRetriever
+↓
+Qdrant
+↓
+Retrieved Chunks
+↓
+Prompt Builder
+↓
+LLM
+
+Responsibilities:
+
+Qdrant:
+
+- Persistent Vector Storage
+- Approximate Nearest Neighbour Search
+- Metadata Storage
+
+VectorRetriever:
+
+- Query Embedding Generation
+- Retrieval Orchestration
+
+RetrievalResultProcessor:
+
+- Similarity Filtering
+- Ranking
+- Diagnostic Calculations
+
+This separation preserves clean architecture boundaries while enabling future retrieval enhancements.
