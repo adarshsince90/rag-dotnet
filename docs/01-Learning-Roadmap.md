@@ -110,6 +110,8 @@ Production Hardening
 
 ✅ Sprint 7A - Streaming Responses
 
+✅ Sprint 7B - Conversational Memory
+
 ⬜ Sprint 8 - Evaluation & Testing
 
 ⬜ Sprint 9 - Production Hardening

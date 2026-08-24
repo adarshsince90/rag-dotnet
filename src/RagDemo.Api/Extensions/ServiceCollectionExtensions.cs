@@ -1,6 +1,7 @@
 using RagDemo.Application.Prompts;
 using RagDemo.Application.Services;
 using RagDemo.Domain.Contracts;
+using RagDemo.Infrastructure.Conversation;
 using RagDemo.Infrastructure.Documents;
 using RagDemo.Infrastructure.Documents.Extraction;
 using RagDemo.Infrastructure.Embedding;
@@ -70,6 +71,15 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IVectorStore,
             QdrantVectorStore>();
+
+        services.AddSingleton<IConversationMemory,
+            InMemoryConversationMemory>();
+
+        services.AddSingleton<IConversationQueryBuilder,
+            ConversationQueryBuilder>();
+
+        services.AddScoped<
+            ConversationQuestionAnsweringService>();
 
         return services;
     }

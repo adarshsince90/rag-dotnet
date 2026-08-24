@@ -461,3 +461,65 @@ text/event-stream
 
 This improves perceived latency by delivering
 tokens incrementally as they are generated.
+
+---
+
+# ADR-021
+
+# Introduce Conversational Memory
+
+Status
+
+Accepted
+
+---
+
+## Context
+
+The application supported only single-turn interactions.
+
+Follow-up questions lacked historical context.
+
+---
+
+## Decision
+
+Introduce:
+
+- IConversationMemory
+- InMemoryConversationMemory
+
+Conversation history is injected into prompts.
+
+History-aware retrieval is implemented using:
+
+Previous Questions
++
+Current Question
+
+instead of introducing query rewriting.
+
+---
+
+## Consequences
+
+Benefits:
+
+- Follow-up question support
+- Conversation continuity
+- Minimal architecture changes
+
+Tradeoffs:
+
+- Larger prompts
+- Increased generation time
+- Memory lost on restart
+
+---
+
+## Future Opportunities
+
+- Persistent memory
+- Semantic memory
+- Query rewriting
+- Memory summarization

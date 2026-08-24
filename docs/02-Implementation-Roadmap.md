@@ -384,3 +384,167 @@ Goals:
 - Context-aware follow-up questions
 - Memory-aware prompt builder
 
+---
+
+# Sprint 7B Learnings
+
+## Learning 1
+
+Conversation Memory and Knowledge Memory are different concepts.
+
+Conversation Memory:
+
+Stores prior interactions.
+
+Knowledge Memory:
+
+Stores retrieved document knowledge.
+
+---
+
+## Learning 2
+
+History-aware retrieval can significantly improve retrieval quality.
+
+Using:
+
+Previous Questions
++
+Current Question
+
+provides stronger retrieval signals than current question alone.
+
+---
+
+## Learning 3
+
+Prompt growth becomes a new system concern.
+
+Memory introduces additional context.
+
+Prompt size increases with conversation length.
+
+---
+
+## Learning 4
+
+Query rewriting is not required initially.
+
+Useful conversational behavior can be achieved through:
+
+History-Aware Retrieval
++
+History-Aware Prompting
+
+without introducing an additional LLM call.
+
+## Sprint 7A ✅
+
+Streaming Responses
+
+Completed:
+
+- Ollama Streaming
+- SSE Endpoint
+- IAsyncEnumerable Support
+- /ask/stream
+
+---
+
+## Sprint 7B ✅
+
+Conversational Memory
+
+Completed:
+
+- ConversationTurn
+- IConversationMemory
+- InMemoryConversationMemory
+- ConversationQueryBuilder
+- History-Aware Retrieval
+- Memory-Aware Prompting
+- /ask/conversation/stream
+
+---
+
+## Sprint 7
+
+A significant milestone was reached with the introduction of conversational memory.
+
+The system now combines:
+
+Knowledge Retrieval
++
+Conversation Memory
+
+Knowledge is retrieved from Qdrant while conversational context is maintained independently.
+
+Important realization:
+
+Memory and retrieval solve different problems.
+
+Memory answers:
+
+"What are we talking about?"
+
+Retrieval answers:
+
+---
+
+# Sprint 7 Retrospective
+
+## What Went Well
+
+- Streaming implementation was straightforward.
+- Existing architecture adapted cleanly.
+- Qdrant integration remained unaffected.
+- Conversation memory provided immediate value.
+
+## Challenges
+
+- Streaming SSE testing.
+- Ollama response deserialization.
+- Deciding how history should influence retrieval.
+
+## Key Learnings
+
+- Streaming improves perceived latency.
+- Memory-aware retrieval is more effective than memory-only prompting.
+- Conversation memory and knowledge retrieval should remain independent concerns.
+- Prompt growth becomes a new architectural consideration.
+
+## Future Directions
+
+- Evaluation Framework
+- Query Rewriting
+- Memory Summarization
+- Semantic Memory
+- Agentic Retrieval
+
+---
+
+Observed Limitation
+
+History-aware retrieval can introduce topic bias.
+
+Example:
+
+Conversation:
+
+- What is attention?
+- How does it relate to transformers?
+
+Followed by:
+
+- What is human attention?
+
+The retrieval system may continue retrieving
+machine-learning-related attention content due
+to strong conversational context.
+
+Future enhancements may require:
+
+- Topic Shift Detection
+- Query Classification
+- Memory Relevance Scoring
+- Semantic Memory Retrieval

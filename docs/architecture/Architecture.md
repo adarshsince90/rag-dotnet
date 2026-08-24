@@ -24,7 +24,6 @@ The API layer should not contain business logic or infrastructure implementation
 
 Example:
 
-```text
 POST /ask
 
 ## Current Retrieval Flow
@@ -280,3 +279,107 @@ RetrievalResultProcessor:
 - Diagnostic Calculations
 
 This separation preserves clean architecture boundaries while enabling future retrieval enhancements.
+
+---
+
+# Conversational RAG Architecture
+
+Sprint 7B introduced conversational memory capabilities.
+
+The system now supports:
+
+- Single-turn RAG
+- Multi-turn Conversational RAG
+- Streaming Responses
+
+---
+
+## Standard RAG Flow
+
+Question
+↓
+Retrieval
+↓
+Prompt Construction
+↓
+LLM
+↓
+Response
+
+Endpoints:
+
+POST /ask
+
+POST /ask/stream
+
+---
+
+## Conversational RAG Flow
+
+ConversationId
++
+Current Question
+↓
+Load Conversation History
+↓
+Build Retrieval Query
+(Previous Questions + Current Question)
+↓
+Qdrant Retrieval
+↓
+Prompt Construction
+(History + Retrieved Context)
+↓
+LLM
+↓
+Store Interaction
+↓
+Streaming Response
+
+Endpoint:
+
+POST /ask/conversation/stream
+
+---
+
+## Memory Architecture
+
+Conversation Memory is independent from document retrieval.
+
+Conversation Memory:
+
+Stores:
+
+- User Questions
+- Assistant Responses
+- Timestamp
+
+Purpose:
+
+Provide conversational continuity.
+
+---
+
+Knowledge Memory:
+
+Qdrant
+
+Stores:
+
+- Document Chunks
+- Embeddings
+- Metadata
+
+Purpose:
+
+Provide knowledge retrieval.
+
+---
+
+The application now combines:
+
+Conversation Memory
++
+Knowledge Memory
+
+to generate responses.

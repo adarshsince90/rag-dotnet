@@ -1,3 +1,4 @@
+using RagDemo.Infrastructure.Conversation;
 using RagDemo.Infrastructure.Storage.Qdrant;
 
 public static class OptionsExtensions
@@ -21,6 +22,9 @@ public static class OptionsExtensions
         services.Configure<QdrantOptions>(
             configuration.GetSection(QdrantOptions.SectionName));
 
+        services.Configure<ConversationOptions>(
+            configuration.GetSection(
+            ConversationOptions.SectionName));
 
         return services;
     }

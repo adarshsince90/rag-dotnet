@@ -49,6 +49,39 @@ public static class QuestionEndpoints
                 }
         });
 
+        endpoints.MapPost("/ask/conversation",
+            async (
+                HttpContext context,
+                AskConversationRequest request,
+                ConversationQuestionAnsweringService service,
+                CancellationToken cancellationToken) =>
+        {
+          context.Response.ContentType =
+                "text/event-stream";
+            
+            context.Response.Headers.Append(
+                "Cache-Control",
+                "no-cache");
+                
+            context.Response.Headers.Append(
+                "Connection",
+                "keep-alive");
+                
+            await foreach (var token in service
+                .AskConversationStreamAsync(
+                    request.ConversationId, 
+                    request.Question, 
+                    cancellationToken).WithCancellation(cancellationToken))
+                {
+                    await context.Response.WriteAsync(
+                        $"{token}",
+                        cancellationToken);
+
+                    await context.Response.Body.FlushAsync(
+                        cancellationToken);
+                }
+        });
+
         return endpoints;
     }
 }
