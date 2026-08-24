@@ -1,3 +1,4 @@
+using System.Text.Json;
 using RagDemo.Application.Dtos;
 
 public static class QuestionEndpoints
@@ -67,21 +68,48 @@ public static class QuestionEndpoints
                 "Connection",
                 "keep-alive");
                 
-            await foreach (var token in service
+            await foreach (var streamEvent in service
                 .AskConversationStreamAsync(
                     request.ConversationId, 
                     request.Question, 
                     cancellationToken).WithCancellation(cancellationToken))
                 {
-                    await context.Response.WriteAsync(
-                        $"{token}",
-                        cancellationToken);
+                    // await context.Response.WriteAsync(
+                    //     $"{token}",
+                    //     cancellationToken);
 
-                    await context.Response.Body.FlushAsync(
+                    // await context.Response.Body.FlushAsync(
+                    //     cancellationToken);
+
+                    await WriteEventAsync(
+                        context.Response,
+                        streamEvent.EventType,
+                        streamEvent.Payload,
                         cancellationToken);
                 }
         });
 
         return endpoints;
+    }
+
+    private static async Task WriteEventAsync<T>(
+        HttpResponse response,
+        string eventType,
+        T payload,
+        CancellationToken cancellationToken)
+    {
+        var json =
+            JsonSerializer.Serialize(payload);
+
+        await response.WriteAsync(
+            $"event: {eventType}\n",
+            cancellationToken);
+
+        await response.WriteAsync(
+            $"data: {json}\n\n",
+            cancellationToken);
+
+        await response.Body.FlushAsync(
+            cancellationToken);
     }
 }

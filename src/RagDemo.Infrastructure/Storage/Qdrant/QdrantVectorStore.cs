@@ -89,7 +89,7 @@ public sealed class QdrantVectorStore : IVectorStore
             await _client.QueryAsync(
                 collectionName: _options.CollectionName,
                 query: embedding,
-                limit: (ulong)_retrievalOptions.TopK,
+                limit: (ulong)_retrievalOptions.SearchLimit,
                 cancellationToken: cancellationToken);
 
         return response

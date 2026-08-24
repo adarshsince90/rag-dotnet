@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using RagDemo.Application.Services;
 using RagDemo.Domain.Contracts;
+using RagDemo.Domain.Models;
 
 public sealed class ConversationQuestionAnsweringService
 {
@@ -30,7 +32,7 @@ public sealed class ConversationQuestionAnsweringService
         _logger = logger;
     }
 
-    public async IAsyncEnumerable<string> AskConversationStreamAsync(
+    public async IAsyncEnumerable<StreamingEvent> AskConversationStreamAsync(
         string conversationId,
         string question, 
         [EnumeratorCancellation]
@@ -49,12 +51,44 @@ public sealed class ConversationQuestionAnsweringService
             _queryBuilder.BuildQuery(
             question,
             history);
+
+        yield return new StreamingEvent
+        {
+            EventType = "conversation",
+            Payload = new ConversationDiagnostics
+            (
+                ConversationId: conversationId,
+                TurnsUsed: history.Count,
+                HistoryCharacters: history.Sum(x=>
+                    x.Question.Length + 
+                    x.Answer.Length),
+                RetrievalQueryCharacters: retrievalQuery.Length
+            )
+        };
         
         var retrievalResponse =
             await _retrievalService
                 .RetrieveAsync(
                     retrievalQuery,
                     cancellationToken);
+
+        var scores =
+            retrievalResponse.Matches
+            .Select(x => x.Score)
+            .ToList();
+
+        yield return new StreamingEvent
+            {
+                EventType = "retrieval",
+                Payload = new RetrievalMetrics
+                {
+                    ReturnedChunks = retrievalResponse.Matches.Count,
+                    AverageScore = scores.Any() ? scores.Average() : 0,
+                    HighestScore =
+                    scores.Any() ? scores.Max() : 0,
+                    LowestScore = scores.Any() ? scores.Min() : 0
+                }
+            };
 
         _logger.LogInformation(
             "Retrieved {Count} chunks",
@@ -72,8 +106,21 @@ public sealed class ConversationQuestionAnsweringService
                     context,
                     history);
 
+        yield return new StreamingEvent
+        {
+            EventType = "prompt",
+            Payload = new PromptDiagnostics
+            (
+                ContextCharacters: context.Length,
+                PromptCharacters: prompt.Length,
+                RetrievedChunkCount: retrievalResponse.Matches.Count
+            )
+        };
+
         var answerBuilder =
             new StringBuilder();
+
+        var generationStopwatch = Stopwatch.StartNew();
 
         await foreach 
             (var token in 
@@ -82,9 +129,28 @@ public sealed class ConversationQuestionAnsweringService
                     cancellationToken))
                     {
                         answerBuilder.Append(token);
-                        yield return token;
+                        // yield return token;
+                        yield return new StreamingEvent
+                        {
+                            EventType = "token",
+                            Payload = token
+                        };
                     }
         
+        generationStopwatch.Stop();
+
+        yield return new StreamingEvent
+        {
+            EventType = "completed",
+            Payload = new GenerationDiagnostics
+            {
+                GenerationMs =
+                    generationStopwatch.ElapsedMilliseconds,
+                AnswerCharacters =
+                    answerBuilder.Length
+            }
+        };
+
         await _conversationMemory.AddTurnAsync(
             conversationId,
             new ConversationTurn

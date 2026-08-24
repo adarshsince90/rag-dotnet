@@ -4,6 +4,7 @@ obj/
 
 # Test Results
 TestResults/
+docs/personal/
 
 # User files
 *.user

@@ -29,6 +29,7 @@ app.MapDiagnosticEndpoints();
 app.MapRetrievalEndpoints();
 app.MapGenerateEmbeddingsEndpoints();
 app.MapQuestionEndpoints();
+app.MapConversationEndpoints();
 
 await StartupTasks.InitializeAsync(app.Services);
 
