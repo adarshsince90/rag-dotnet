@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using RagDemo.Application.Services;
 using RagDemo.Domain.Contracts;
 
@@ -7,15 +9,18 @@ public sealed class QuestionAnsweringService
     private readonly RetrievalService _retrievalService;
     private readonly IChatCompletionService _chatCompletionService;
     private readonly IPromptBuilder _promptBuilder;
+    private readonly ILogger<QuestionAnsweringService> _logger;
 
     public QuestionAnsweringService(
         RetrievalService retrievalService,
         IChatCompletionService chatCompletionService,
-        IPromptBuilder promptBuilder)
+        IPromptBuilder promptBuilder,
+        ILogger<QuestionAnsweringService> logger)
     {
         _retrievalService = retrievalService;
         _chatCompletionService = chatCompletionService;
         _promptBuilder = promptBuilder;
+        _logger = logger;
     }
 
     public async Task<QuestionAnswerResponse> AskAsync(string question, CancellationToken cancellationToken = default)
@@ -74,6 +79,50 @@ public sealed class QuestionAnsweringService
                 llmInvoked = true
             },
             retrievalResponse.Matches);
+    }
+
+    public async IAsyncEnumerable<string> AskStreamAsync(
+        string question, 
+        [EnumeratorCancellation]
+        CancellationToken cancellationToken = default)
+    {
+        _logger.LogInformation(
+            "AskStreamAsync started");
+
+        var retrievalStopwatch = Stopwatch.StartNew();
+        
+        var retrievalResponse =
+            await _retrievalService
+                .RetrieveAsync(
+                    question,
+                    cancellationToken);
+
+        _logger.LogInformation(
+            "Retrieved {Count} chunks",
+            retrievalResponse.Matches.Count);
+
+        retrievalStopwatch.Stop();
+
+       if (retrievalResponse.Matches == null ||
+            !retrievalResponse.Matches.Any())
+            {
+                yield return "I could not find the answer in the provided documents.";
+                yield break;
+            }
+
+        var context = BuildContext(retrievalResponse.Matches);
+
+        var prompt =
+            _promptBuilder.BuildPrompt(
+            question,
+            context);
+
+        await foreach 
+            (var token in 
+                _chatCompletionService .GenerateStreamingAsync(prompt, cancellationToken))
+                    {
+                        yield return token;
+                    }
     }
 
     private static string BuildContext(

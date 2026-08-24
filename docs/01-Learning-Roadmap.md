@@ -106,9 +106,9 @@ Production Hardening
 
 ✅ Sprint 5 - PDF Processing
 
-✅ Sprint 6 - Vector Database
+✅ Sprint 6 - Persistent Vector Storage (Qdrant)
 
-⬜ Sprint 7 - Conversational Memory
+✅ Sprint 7A - Streaming Responses
 
 ⬜ Sprint 8 - Evaluation & Testing
 

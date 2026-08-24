@@ -415,3 +415,49 @@ Tradeoffs:
 - Dynamic Search Limit
 - Query Classification
 - Agentic Retrieval
+
+
+## Streaming Response Pipeline
+
+The system supports two answer-generation modes.
+
+### Standard Mode
+
+Question
+↓
+Retrieval
+↓
+Prompt
+↓
+LLM
+↓
+Complete Response
+
+Endpoint:
+
+POST /ask
+
+---
+
+### Streaming Mode
+
+Question
+↓
+Retrieval
+↓
+Prompt
+↓
+LLM Streaming
+↓
+SSE Events
+
+Endpoint:
+
+POST /ask/stream
+
+Response Type:
+
+text/event-stream
+
+This improves perceived latency by delivering
+tokens incrementally as they are generated.

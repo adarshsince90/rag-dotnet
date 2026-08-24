@@ -1,4 +1,7 @@
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RagDemo.Domain.Contracts;
 public sealed class OllamaChatCompletionService
@@ -6,13 +9,16 @@ public sealed class OllamaChatCompletionService
 {
     private readonly HttpClient _httpClient;
     private readonly OllamaOptions _options;
+    private readonly ILogger<OllamaChatCompletionService> _logger;
 
     public OllamaChatCompletionService(
         HttpClient httpClient,
-        IOptions<OllamaOptions> options)
+        IOptions<OllamaOptions> options,
+        ILogger<OllamaChatCompletionService> logger)
     {
         _httpClient = httpClient;
         _options = options.Value;
+        _logger = logger;
     }
 
     public async Task<string> GenerateAnswerAsync(
@@ -39,5 +45,68 @@ public sealed class OllamaChatCompletionService
                     cancellationToken: cancellationToken);
 
         return result?.Response ?? string.Empty;
+    }
+
+    public async IAsyncEnumerable<string> GenerateStreamingAsync(
+    string prompt,
+    [EnumeratorCancellation]
+    CancellationToken cancellationToken = default)
+    {
+        var request = new OllamaGenerateRequest
+        {
+            Model = _options.ChatModel,
+            Prompt = prompt,
+            Stream = true
+        };
+
+        
+        _logger.LogInformation("Calling ollama /generate api with {request}... ",request.Prompt.ToString());
+
+        var httpRequest = new HttpRequestMessage(
+            HttpMethod.Post,
+            $"{_options.BaseUrl}/api/generate")
+        {
+            Content = JsonContent.Create(request)
+        };
+
+        var response = await _httpClient.SendAsync(
+            httpRequest,
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+
+        response.EnsureSuccessStatusCode();
+
+        await using var stream =
+            await response.Content.ReadAsStreamAsync(
+                cancellationToken);
+
+        using var reader = new StreamReader(stream);
+
+        string? line;
+
+        while ((line = await reader.ReadLineAsync(
+            cancellationToken)) is not null)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            var chunk =
+                JsonSerializer.Deserialize<
+                    OllamaGenerateResponse>(line);
+
+            // _logger.LogDebug("Raw Ollama response: {Line}",line);
+            
+            // _logger.LogDebug("Response='{Response}', Done={Done}",chunk?.Response,chunk?.Done);
+
+            if (!string.IsNullOrWhiteSpace(
+                    chunk?.Response))
+            {
+                yield return chunk.Response;
+            }
+            
+            if (chunk?.Done == true)
+                yield break;
+        }
+        yield break;
     }
 }
