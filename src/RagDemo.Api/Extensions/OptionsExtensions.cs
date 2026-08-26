@@ -23,8 +23,10 @@ public static class OptionsExtensions
             configuration.GetSection(QdrantOptions.SectionName));
 
         services.Configure<ConversationOptions>(
-            configuration.GetSection(
-            ConversationOptions.SectionName));
+            configuration.GetSection(ConversationOptions.SectionName));
+
+        services.Configure<EvaluationOptions>(
+            configuration.GetSection(EvaluationOptions.SectionName));
 
         return services;
     }

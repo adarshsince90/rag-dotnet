@@ -50,7 +50,7 @@ public static class QuestionEndpoints
                 }
         });
 
-        endpoints.MapPost("/ask/conversation",
+        endpoints.MapPost("/conversation/stream",
             async (
                 HttpContext context,
                 AskConversationRequest request,

@@ -112,6 +112,6 @@ Production Hardening
 
 ✅ Sprint 7B - Conversational Memory
 
-⬜ Sprint 8 - Evaluation & Testing
+✅ Sprint 8 - Evaluation & Testing
 
 ⬜ Sprint 9 - Production Hardening

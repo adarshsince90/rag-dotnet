@@ -1,8 +1,9 @@
+using RagDemo.Application.Evaluation.Services;
 using RagDemo.Application.Prompts;
 using RagDemo.Application.Services;
 using RagDemo.Domain.Contracts;
+using RagDemo.Domain.Evaluation.Contracts;
 using RagDemo.Infrastructure.Conversation;
-using RagDemo.Infrastructure.Documents;
 using RagDemo.Infrastructure.Documents.Extraction;
 using RagDemo.Infrastructure.Embedding;
 using RagDemo.Infrastructure.Storage;
@@ -80,6 +81,12 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<
             ConversationQuestionAnsweringService>();
+
+        services.AddScoped<IEvaluationService,
+            EvaluationService>();
+
+        services.AddScoped<IEvaluationDatasetProvider,
+            JsonEvaluationDatasetProvider>();
 
         return services;
     }

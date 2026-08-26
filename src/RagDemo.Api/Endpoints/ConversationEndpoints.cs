@@ -5,7 +5,7 @@ public static class ConversationEndpoints
     public static IEndpointRouteBuilder MapConversationEndpoints(
         this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/conversation/stream",
+        endpoints.MapPost("/api-conversation/stream",
             async (
                 HttpContext context,
                 AskConversationRequest request,

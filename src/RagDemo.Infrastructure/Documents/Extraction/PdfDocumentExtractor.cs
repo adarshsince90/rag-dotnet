@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using RagDemo.Domain.Contracts;
 using UglyToad.PdfPig;
 
@@ -13,11 +14,28 @@ public sealed class PdfDocumentExtractor
         using var document =
             PdfDocument.Open(filePath);
 
+        // var text =
+        //     string.Join(
+        //         Environment.NewLine,
+        //         document.GetPages()
+        //             .Select(page => page.Text));
+
+         var pages = document
+            .GetPages()
+            .Select(page =>
+                string.Join(
+                    " ",
+                    page.GetWords()
+                        .Select(word => word.Text)));
+
         var text =
             string.Join(
                 Environment.NewLine,
-                document.GetPages()
-                    .Select(page => page.Text));
+                pages);
+        
+        Regex.Replace(text, @"\s+", " ");
+        text = text.Replace(" .", ".");
+        text = text.Replace(" ,", ",");
 
         return Task.FromResult(text);
     }

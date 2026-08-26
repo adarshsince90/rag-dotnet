@@ -1,0 +1,252 @@
+{
+  "totalQuestions": 12,
+  "expectedSourceFoundCount": 10,
+  "expectedSourceCoverage": 0.8333333333333334,
+  "averageKeywordCoverage": 0.875,
+  "groundingPasses": 12,
+  "groundingAccuracy": 1,
+  "averageRetrievalMs": 0,
+  "averageGenerationMs": 39491,
+  "averageHighestScore": 0.6699078579743704,
+  "results": [
+    {
+      "testCaseId": 1,
+      "category": "definition",
+      "conversationId": "eval-1",
+      "finalQuestion": "What is attention?",
+      "expectedSource": "attention-is-what-you-need.pdf",
+      "retrievedSources": [
+        "attention-is-what-you-need.pdf",
+        "transformer-limit.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.645540714263916,
+      "generatedAnswer": "In this document, attention is described as a mechanism that relates different positions of a single sequence to compute a representation of the sequence.  Specifically, it uses \"self-attention\" which considers all parts of the input sequence when building output representations. Self-attention has been used in various tasks like reading comprehension and abstractive summarization.  \n\n\nLet me know if you have other questions about this document! \n",
+      "retrievalMs": 0,
+      "generationMs": 48503,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 2,
+      "category": "definition",
+      "conversationId": "eval-2",
+      "finalQuestion": "What is self-attention?",
+      "expectedSource": "attention-is-what-you-need.pdf",
+      "retrievedSources": [
+        "attention-is-what-you-need.pdf",
+        "transformer-limit.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.7249335050582886,
+      "generatedAnswer": "Self-attention, sometimes called intra-attention, is an attention mechanism that relates different positions of a single sequence to compute a representation of the sequence. \n",
+      "retrievalMs": 0,
+      "generationMs": 32270,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 3,
+      "category": "definition",
+      "conversationId": "eval-3",
+      "finalQuestion": "What is BERT?",
+      "expectedSource": "transformers-llm.pdf",
+      "retrievedSources": [
+        "bert-pretraining.pdf",
+        "transformers-llm.pdf",
+        "transformer-limit.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.626086950302124,
+      "generatedAnswer": "BERT (Bidirectional Encoder Representations from Transformers) is a language representation model designed to pre-train deep bidirectional representations from unlabeled text.  It uses a transformer architecture for processing sequences of tokens and can be fine-tuned for downstream tasks using labeled data. \n",
+      "retrievalMs": 0,
+      "generationMs": 56848,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 4,
+      "category": "relationship",
+      "conversationId": "eval-4",
+      "finalQuestion": "How does attention help transformers?",
+      "expectedSource": "attention-is-what-you-need.pdf",
+      "retrievedSources": [
+        "attention-is-what-you-need.pdf",
+        "transformer-limit.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.6951852440834045,
+      "generatedAnswer": "Self-attention is a variant of attention that processes a sequence by replacing each element by a weighted average of the rest of the sequence. The Transformer architecture uses self-attention to compute representations of its input and output without using sequence-aligned RNNs or convolution. \n",
+      "retrievalMs": 0,
+      "generationMs": 30174,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 5,
+      "category": "relationship",
+      "conversationId": "eval-5",
+      "finalQuestion": "What are the advantages of transformers over RNNs?",
+      "expectedSource": "attention-is-what-you-need.pdf",
+      "retrievedSources": [
+        "attention-is-what-you-need.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.666175365447998,
+      "generatedAnswer": "The Transformer outperforms RNN sequence-to-sequence models in several ways, including being more parallelizable and requiring significantly less time to train. It also achieves better quality results in machine translation tasks.  Additionally, the Transformer eliminates the need for recurrence and convolutions entirely. \n",
+      "retrievalMs": 0,
+      "generationMs": 34311,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 6,
+      "category": "concept",
+      "conversationId": "eval-6",
+      "finalQuestion": "What is in-context learning?",
+      "expectedSource": "language-model-few-shots.pdf",
+      "retrievedSources": [
+        "language-model-few-shots.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.7327995896339417,
+      "generatedAnswer": "In-context learning involves a language model absorbing many skills and tasks within the parameters of the model. It uses these abilities + at inference time to rapidly adapt to or recognize the desired task, following the inner loop of the meta-learning process. \n",
+      "retrievalMs": 0,
+      "generationMs": 30750,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 7,
+      "category": "concept",
+      "conversationId": "eval-7",
+      "finalQuestion": "What is few-shot learning?",
+      "expectedSource": "language-model-few-shots.pdf",
+      "retrievedSources": [
+        "language-model-few-shots.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 1,
+      "totalKeywords": 2,
+      "keywordCoverage": 0.5,
+      "highestScore": 0.7788200974464417,
+      "generatedAnswer": "Few-shot learning is a method where models learn based on a broad distribution of tasks (implicit in pre-training data) and then rapidly adapt to a new task using only one demonstration.  It reduces the need for task-specific data compared to fine-tuning, offering a trade-off between performance and sample efficiency. \n",
+      "retrievalMs": 0,
+      "generationMs": 36687,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 8,
+      "category": "paper",
+      "conversationId": "eval-8",
+      "finalQuestion": "What are the main contributions of BERT?",
+      "expectedSource": "transformers-llm.pdf",
+      "retrievedSources": [
+        "transformer-limit.pdf",
+        "bert-pretraining.pdf"
+      ],
+      "expectedSourceFound": false,
+      "matchedKeywords": 1,
+      "totalKeywords": 2,
+      "keywordCoverage": 0.5,
+      "highestScore": 0.6247946619987488,
+      "generatedAnswer": "BERT achieves state-of-the-art results on a wide range of NLP tasks, outperforming previous language models and even achieving comparable or better performance than BERT itself on some specific benchmarks. It significantly improves on existing language modeling methods by optimizing pre-training with careful hyperparameter tuning.  It is also shown to be more robust to various conditions due to its architecture and training process. \n",
+      "retrievalMs": 0,
+      "generationMs": 62643,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 9,
+      "category": "paper",
+      "conversationId": "eval-9",
+      "finalQuestion": "What are the main contributions of the Transformer paper?",
+      "expectedSource": "attention-is-what-you-need.pdf",
+      "retrievedSources": [
+        "transformer-limit.pdf",
+        "attention-is-what-you-need.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.6451153755187988,
+      "generatedAnswer": "The main contributions of the Transformer paper include the design and implementation of a self-attention based model architecture that has been successfully applied to various machine learning tasks such as natural language processing (NLP). \n\n\nLet me know if you have other questions. \n",
+      "retrievalMs": 0,
+      "generationMs": 38831,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 10,
+      "category": "memory",
+      "conversationId": "memory-test-1",
+      "finalQuestion": "How does it help transformers?",
+      "expectedSource": "attention-is-what-you-need.pdf",
+      "retrievedSources": [
+        "transformer-limit.pdf",
+        "attention-is-what-you-need.pdf",
+        "transformers-llm.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.6035206317901611,
+      "generatedAnswer": "Self-attention is a variant of attention that processes a sequence by replacing each element by a weighted average of the rest of the sequence. It has been used successfully in a variety of tasks, including reading comprehension, abstractive summarization, textual entailment and learning task-independent sentence representations.  The Transformer generalizes well to other tasks. \n",
+      "retrievalMs": 0,
+      "generationMs": 36030,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 11,
+      "category": "memory",
+      "conversationId": "memory-test-2",
+      "finalQuestion": "How does it differ from GPT?",
+      "expectedSource": "transformers-llm.pdf",
+      "retrievedSources": [
+        "language-model-few-shots.pdf"
+      ],
+      "expectedSourceFound": false,
+      "matchedKeywords": 1,
+      "totalKeywords": 2,
+      "keywordCoverage": 0.5,
+      "highestScore": 0.6630094051361084,
+      "generatedAnswer": "GPT-3 and GPT differ in their approaches to pre-training.  They use similar basic methods with some key differences. The text mentions GPT-3's approach is inspired by [RWC 19], which focuses on \"in-context learning.\" This contrasts with GPT, which relies on fine-tuning for specific tasks using a supervised dataset.   \n",
+      "retrievalMs": 0,
+      "generationMs": 34949,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 12,
+      "category": "grounding",
+      "conversationId": "eval-12",
+      "finalQuestion": "What is human attention?",
+      "expectedSource": "",
+      "retrievedSources": [
+        "attention-is-what-you-need.pdf",
+        "transformer-limit.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 0,
+      "totalKeywords": 0,
+      "keywordCoverage": 1,
+      "highestScore": 0.6329127550125122,
+      "generatedAnswer": "I could not find the answer in the provided documents. \n",
+      "retrievalMs": 0,
+      "generationMs": 31896,
+      "groundingPassed": true
+    }
+  ],
+  "keywordAccuracy": 0
+}

@@ -1,0 +1,148 @@
+[
+  {
+    "id": 1,
+    "category": "definition",
+    "conversationId": "eval-1",
+    "history": [],
+    "question": "What is attention?",
+    "expectedSource": "attention-is-what-you-need.pdf",
+    "expectedKeywords": [
+      "self-attention",
+      "sequence"
+    ]
+  },
+  {
+    "id": 2,
+    "category": "definition",
+    "conversationId": "eval-2",
+    "history": [],
+    "question": "What is self-attention?",
+    "expectedSource": "attention-is-what-you-need.pdf",
+    "expectedKeywords": [
+      "attention",
+      "sequence"
+    ]
+  },
+  {
+    "id": 3,
+    "category": "definition",
+    "conversationId": "eval-3",
+    "history": [],
+    "question": "What is BERT?",
+    "expectedSource": "transformers-llm.pdf",
+    "expectedKeywords": [
+      "bidirectional",
+      "transformers"
+    ]
+  },
+  {
+    "id": 4,
+    "category": "relationship",
+    "conversationId": "eval-4",
+    "history": [],
+    "question": "How does attention help transformers?",
+    "expectedSource": "attention-is-what-you-need.pdf",
+    "expectedKeywords": [
+      "self-attention",
+      "transformer"
+    ]
+  },
+  {
+    "id": 5,
+    "category": "relationship",
+    "conversationId": "eval-5",
+    "history": [],
+    "question": "What are the advantages of transformers over RNNs?",
+    "expectedSource": "attention-is-what-you-need.pdf",
+    "expectedKeywords": [
+      "parallel",
+      "rnn"
+    ]
+  },
+  {
+    "id": 6,
+    "category": "concept",
+    "conversationId": "eval-6",
+    "history": [],
+    "question": "What is in-context learning?",
+    "expectedSource": "language-model-few-shots.pdf",
+    "expectedKeywords": [
+      "in-context",
+      "task"
+    ]
+  },
+  {
+    "id": 7,
+    "category": "concept",
+    "conversationId": "eval-7",
+    "history": [],
+    "question": "What is few-shot learning?",
+    "expectedSource": "language-model-few-shots.pdf",
+    "expectedKeywords": [
+      "few-shot",
+      "examples"
+    ]
+  },
+  {
+    "id": 8,
+    "category": "paper",
+    "conversationId": "eval-8",
+    "history": [],
+    "question": "What are the main contributions of BERT?",
+    "expectedSource": "bert-pretraining.pdf",
+    "expectedKeywords": [
+      "bidirectional",
+      "pre-training"
+    ]
+  },
+  {
+    "id": 9,
+    "category": "paper",
+    "conversationId": "eval-9",
+    "history": [],
+    "question": "What are the main contributions of the Transformer paper?",
+    "expectedSource": "attention-is-what-you-need.pdf",
+    "expectedKeywords": [
+      "self-attention",
+      "transformer"
+    ]
+  },
+  {
+    "id": 10,
+    "category": "memory",
+    "conversationId": "memory-test-1",
+    "history": [
+      "What is attention?"
+    ],
+    "question": "How does it help transformers?",
+    "expectedSource": "attention-is-what-you-need.pdf",
+    "expectedKeywords": [
+      "attention",
+      "transformer"
+    ]
+  },
+  {
+    "id": 11,
+    "category": "memory",
+    "conversationId": "memory-test-2",
+    "history": [
+      "What is BERT?"
+    ],
+    "question": "How does it differ from GPT?",
+    "expectedSource": "language-model-few-shots.pdf",
+    "expectedKeywords": [
+      "bert",
+      "gpt"
+    ]
+  },
+  {
+    "id": 12,
+    "category": "grounding",
+    "conversationId": "eval-12",
+    "history": [],
+    "question": "What is human attention?",
+    "expectedSource": "",
+    "expectedKeywords": [],
+    "expectGroundedRefusal": true
+  }
+]

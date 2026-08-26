@@ -383,3 +383,12 @@ Conversation Memory
 Knowledge Memory
 
 to generate responses.
+
+---
+Evaluation Dataset
+        ↓
+Evaluation Service
+        ↓
+ConversationQuestionAnsweringService
+        ↓
+RAG Pipeline

@@ -37,6 +37,15 @@ public sealed class OllamaChatCompletionService
             request,
             cancellationToken);
 
+        if (!response.IsSuccessStatusCode)
+        {
+            var error =
+                await response.Content.ReadAsStringAsync(
+                    cancellationToken);
+
+            _logger.LogError("Ollama Error: {Error}", error);
+        }
+
         response.EnsureSuccessStatusCode();
 
         var result =
@@ -73,6 +82,17 @@ public sealed class OllamaChatCompletionService
             httpRequest,
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error =
+                await response.Content
+                    .ReadAsStringAsync();
+
+            _logger.LogError(
+                "Ollama Error: {Error}",
+                error);
+        }
 
         response.EnsureSuccessStatusCode();
 

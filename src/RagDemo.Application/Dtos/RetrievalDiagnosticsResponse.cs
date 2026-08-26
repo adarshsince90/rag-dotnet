@@ -1,5 +1,5 @@
 public record RetrievalDiagnosticsResponse(
-    int TotalChunks,
+    // int TotalChunks,
     int QualifiedChunks,
     int ReturnedChunks,
     int TopK,
