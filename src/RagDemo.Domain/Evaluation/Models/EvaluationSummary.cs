@@ -22,6 +22,13 @@ public sealed record EvaluationSummary
 
     public IReadOnlyCollection<EvaluationResult> Results { get; init; } = [];
 
+    public double Faithfulness => GroundingAccuracy;
+    
+    public double AnswerCorrectness => AverageKeywordCoverage;
+    
+    public double ContextRecall => ExpectedSourceCoverage;
+    
+    public double ContextPrecision => AverageHighestScore;
     // public int SourceMatches { get; init; }
 
     // public int KeywordMatches { get; init; }

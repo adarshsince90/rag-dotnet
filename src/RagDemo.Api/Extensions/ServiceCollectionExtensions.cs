@@ -88,6 +88,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IEvaluationDatasetProvider,
             JsonEvaluationDatasetProvider>();
 
+        services.AddSingleton<IQueryClassifier,
+            QueryClassifier>();
+
         return services;
     }
 }

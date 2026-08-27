@@ -2,6 +2,12 @@ using RagDemo.Domain.Models;
 
 public sealed record ConversationRequestContext
 {
+    public required bool RequiresRetrieval { get; init; }
+
+    public required bool ShouldPersistConversation { get; init; }
+
+    public string? DirectResponse { get; init; }
+
     public required string Prompt { get; init; }
 
     public required string Context { get; init; }
@@ -12,21 +18,9 @@ public sealed record ConversationRequestContext
 
     public required IReadOnlyCollection<ConversationTurn> History { get; init; }
 
-    public required ConversationDiagnostics ConversationDiagnostics
-    {
-        get;
-        init;
-    }
+    public required ConversationDiagnostics ConversationDiagnostics { get; init; }
 
-    public required RetrievalMetrics RetrievalMetrics
-    {
-        get;
-        init;
-    }
+    public required RetrievalMetrics RetrievalMetrics { get; init; }
 
-    public required PromptDiagnostics PromptDiagnostics
-    {
-        get;
-        init;
-    }
+    public required PromptDiagnostics PromptDiagnostics { get; init; }
 }

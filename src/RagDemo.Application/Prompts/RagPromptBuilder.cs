@@ -41,29 +41,35 @@ public sealed class RagPromptBuilder : IPromptBuilder
         sb.AppendLine();
 
         sb.AppendLine(
-            "Answer ONLY using the provided context.");
+            "Conversation history is provided only to help understand references and follow-up questions.");
+
+        sb.AppendLine(
+            "Do NOT use conversation history as factual knowledge.");
 
         sb.AppendLine();
 
         sb.AppendLine(
-            "You may combine and summarize information from multiple parts of the provided context when answering.");
-         
-         sb.AppendLine(
-            "Do not use prior knowledge.");
-        
+            "Use ONLY information from the retrieved document context when answering.");
+
+        sb.AppendLine();
+
         sb.AppendLine(
-            $"If the answer cannot reasonably be determined from the provided context, reply EXACTLY with:");
+            "You may combine, summarize and reason across multiple parts of the retrieved document context.");
+
+        sb.AppendLine();
+
+        sb.AppendLine(
+            "Do not use prior knowledge.");
+
+        sb.AppendLine();
+
+        sb.AppendLine(
+            "If the answer cannot reasonably be determined from the retrieved document context, reply EXACTLY with:");
+
+        sb.AppendLine();
 
         sb.AppendLine(
             $"\"{PromptConstants.NotFoundResponse}\"");
-
-        sb.AppendLine();
-
-        // sb.AppendLine(
-        //     "Do not make assumptions.");
-
-        // sb.AppendLine(
-        //     "Do not infer information that is not present in the context.");
 
         sb.AppendLine();
 
@@ -71,6 +77,8 @@ public sealed class RagPromptBuilder : IPromptBuilder
         {
             sb.AppendLine(
                 "Conversation History:");
+
+            sb.AppendLine();
 
             foreach (var turn in history)
             {
@@ -85,7 +93,9 @@ public sealed class RagPromptBuilder : IPromptBuilder
         }
 
         sb.AppendLine(
-            "Context:");
+            "Retrieved Document Context:");
+
+        sb.AppendLine();
 
         sb.AppendLine(context);
 

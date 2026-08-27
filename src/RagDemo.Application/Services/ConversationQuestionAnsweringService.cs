@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using RagDemo.Application.Constants;
 using RagDemo.Application.Services;
 using RagDemo.Domain.Contracts;
 
@@ -12,6 +13,7 @@ public sealed class ConversationQuestionAnsweringService
     private readonly IPromptBuilder _promptBuilder;
     private readonly IConversationMemory _conversationMemory;
     private readonly IConversationQueryBuilder _queryBuilder;
+    private readonly IQueryClassifier _queryClassifier;
     private readonly ILogger<ConversationQuestionAnsweringService> _logger;
 
     public ConversationQuestionAnsweringService(
@@ -20,6 +22,7 @@ public sealed class ConversationQuestionAnsweringService
         IPromptBuilder promptBuilder,
         IConversationMemory conversationMemory,
         IConversationQueryBuilder conversationQueryBuilder,
+        IQueryClassifier queryClassifier,
         ILogger<ConversationQuestionAnsweringService> logger)
     {
         _retrievalService = retrievalService;
@@ -27,6 +30,7 @@ public sealed class ConversationQuestionAnsweringService
         _promptBuilder = promptBuilder;
         _conversationMemory = conversationMemory;
         _queryBuilder = conversationQueryBuilder;
+        _queryClassifier = queryClassifier;
         _logger = logger;
     }
 
@@ -46,6 +50,30 @@ public sealed class ConversationQuestionAnsweringService
                 conversationId,
                 question,
                 cancellationToken);
+
+        if (!requestContext.RequiresRetrieval)
+        {
+            yield return new StreamingEvent
+            {
+                EventType = "token",
+                Payload =
+                    requestContext.DirectResponse!
+            };
+
+            yield return new StreamingEvent
+            {
+                EventType = "completed",
+                Payload = new GenerationDiagnostics
+                {
+                    GenerationMs = 0,
+                    TotalMs = 0,
+                    AnswerCharacters =
+                        requestContext.DirectResponse?.Length ?? 0
+                }
+            };
+
+            yield break;
+        }
 
 
         yield return new StreamingEvent
@@ -112,15 +140,17 @@ public sealed class ConversationQuestionAnsweringService
             }
         };
 
-        await _conversationMemory.AddTurnAsync(
-            conversationId,
-            new ConversationTurn
-            {
-                Question = question,
-                Answer = answerBuilder.ToString()
-            },
-            cancellationToken
-        );
+        if (requestContext.ShouldPersistConversation)
+        {
+            await _conversationMemory.AddTurnAsync(
+                conversationId,
+                new ConversationTurn
+                {
+                    Question = question,
+                    Answer = answerBuilder.ToString()
+                },
+                cancellationToken);
+        }
     }
 
     private async Task<ConversationRequestContext>
@@ -129,6 +159,47 @@ public sealed class ConversationQuestionAnsweringService
         string question,
         CancellationToken cancellationToken)
     {
+        var classification =
+            _queryClassifier.Classify(question);
+
+        if (classification.QueryType != QueryType.DocumentQuestion)
+        {
+            return new ConversationRequestContext
+            {
+                RequiresRetrieval = false,
+                ShouldPersistConversation = false,
+
+                DirectResponse =
+                    classification.Response,
+
+                Prompt = string.Empty,
+
+                Context = string.Empty,
+
+                Question = question,
+
+                Matches = [],
+
+                History = [],
+
+                ConversationDiagnostics =
+                    new ConversationDiagnostics(
+                        conversationId,
+                        0,
+                        0,
+                        0),
+
+                RetrievalMetrics =
+                    new RetrievalMetrics(),
+
+                PromptDiagnostics =
+                    new PromptDiagnostics(
+                        0,
+                        0,
+                        0)
+            };
+        }
+
         var history =
             await _conversationMemory
                 .GetRecentTurnsAsync(
@@ -152,12 +223,50 @@ public sealed class ConversationQuestionAnsweringService
                     retrievalQuery.Length);
 
         var retrievalStopwatch = Stopwatch.StartNew();
+
         var retrievalResponse =
             await _retrievalService
                 .RetrieveAsync(
                     question,//retrievalQuery,
                     cancellationToken);
+
         retrievalStopwatch.Stop();
+
+        if (!retrievalResponse.Matches.Any()
+                && !history.Any())
+        {
+            return new ConversationRequestContext
+            {
+                RequiresRetrieval = false,
+
+                ShouldPersistConversation = false,
+
+                DirectResponse =
+                    PromptConstants.NotFoundResponse,
+
+                Prompt = string.Empty,
+
+                Context = string.Empty,
+
+                Question = question,
+
+                Matches = [],
+
+                History = history,
+
+                ConversationDiagnostics =
+                    conversationDiagnostics,
+
+                RetrievalMetrics =
+                    new RetrievalMetrics(),
+                    
+                PromptDiagnostics =
+                    new PromptDiagnostics(
+                        0,
+                        0,
+                        0)
+            };
+        }
 
         var scores =
             retrievalResponse.Matches
@@ -210,8 +319,13 @@ public sealed class ConversationQuestionAnsweringService
                 RetrievedChunkCount:
                     retrievalResponse.Matches.Count);
 
+        var shouldPersistConversation =
+                retrievalResponse.Matches.Any() || history.Any();
+
         return new ConversationRequestContext
         {
+            RequiresRetrieval = true,
+            ShouldPersistConversation = shouldPersistConversation,
             Prompt = prompt,
             Context = context,
             Question = question,
@@ -243,8 +357,23 @@ public sealed class ConversationQuestionAnsweringService
                 question,
                 cancellationToken);
 
-        var generationStopwatch =
-            Stopwatch.StartNew();
+        if (!requestContext.RequiresRetrieval)
+        {
+            return new QuestionAnswerResponse(
+                Question: question,
+                Answer:
+                    requestContext.DirectResponse!,
+                Diagnostics:
+                    new RetrievalDiagnosticsResponse(
+                        QualifiedChunks: 0,
+                        ReturnedChunks: 0,
+                        TopK: 0,
+                        RetrievalMs: 0,
+                        GenerationMs: 0),
+                Matches: []);
+        }
+
+        var generationStopwatch = Stopwatch.StartNew();
 
         var answer =
             await _chatCompletionService

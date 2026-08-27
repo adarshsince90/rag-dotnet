@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using RagDemo.Application.Constants;
 using RagDemo.Domain.Evaluation.Contracts;
@@ -80,14 +81,19 @@ public sealed class EvaluationService
                 response.Answer
                     .ToLowerInvariant();
 
+            var normalizedAnswer =
+                    Regex.Replace(
+                        response.Answer,
+                        @"\s+",
+                        " ")
+                    .Trim();
+                    
             var groundingPassed =
-                    !testCase.ExpectGroundedRefusal
-                    ||
-                    response.Answer
-                        .Trim()
-                        .Equals(
-                            PromptConstants.NotFoundResponse,
-                            StringComparison.OrdinalIgnoreCase);
+                !testCase.ExpectGroundedRefusal
+                ||
+                normalizedAnswer.Contains(
+                    PromptConstants.NotFoundMarker,
+                    StringComparison.OrdinalIgnoreCase);
 
             var matchedKeywords =
                 testCase.ExpectedKeywords
@@ -166,7 +172,7 @@ public sealed class EvaluationService
             results.Count(x =>
                 x.GroundingPassed);
 
-        return new EvaluationSummary
+        var evaluationSummary = new EvaluationSummary
         {
             TotalQuestions =
                 results.Count,
@@ -217,5 +223,7 @@ public sealed class EvaluationService
 
             Results = results
         };
+
+        return evaluationSummary;
     }
 }

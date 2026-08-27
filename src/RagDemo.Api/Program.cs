@@ -11,6 +11,20 @@ builder.Services
 	.AddApplicationServices()
 	.AddInfrastructureServices();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "web-ui",
+        policy =>
+        {
+            policy
+                .WithOrigins(
+                    "http://localhost:5268")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,6 +35,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("web-ui");
 
 app.MapHealthChecks("/health");
 
