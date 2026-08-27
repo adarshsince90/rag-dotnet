@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 using Qdrant.Client;
 using Qdrant.Client.Grpc;
 using RagDemo.Domain.Models;
-using RagDemo.Infrastructure.Storage.Qdrant;
+using RagDemo.Infrastructure.Configuration;
 
 public sealed class QdrantVectorStore : IVectorStore
 {

@@ -1,4 +1,6 @@
-public sealed class OllamaOptions
+namespace RagDemo.Infrastructure.Configuration;
+
+public sealed class OllamaOptions_old
 {
     public string BaseUrl { get; init; } = string.Empty;
 

@@ -1,4 +1,4 @@
-namespace RagDemo.Infrastructure.Conversation;
+namespace RagDemo.Infrastructure.Configuration;
 
 public sealed class ConversationOptions
 {

@@ -3,18 +3,24 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using RagDemo.Domain.Contracts;
+using RagDemo.Infrastructure.Configuration;
 
 namespace RagDemo.Infrastructure.Embedding;
 
 public sealed class OllamaEmbeddingGenerator : IEmbeddingGenerator
 {
     private readonly HttpClient _httpClient;
-    private readonly OllamaOptions _options;
+    private readonly ProviderOptions _provider;
 
-    public OllamaEmbeddingGenerator(HttpClient httpClient, IOptions<OllamaOptions> options)
+    public OllamaEmbeddingGenerator(HttpClient httpClient, 
+        IOptions<AiOptions> options)
     {
         _httpClient = httpClient;
-        _options = options.Value;
+
+        var aiOptions = options.Value;
+        _provider =
+            aiOptions.Providers[
+            "local"];
     }
 
     public async Task<float[]> GenerateEmbeddingAsync(
@@ -23,11 +29,11 @@ public sealed class OllamaEmbeddingGenerator : IEmbeddingGenerator
     {
         var payload = new
         {
-            model = _options.EmbeddingModel,
+            model = _provider.EmbeddingModel,
             prompt = text
         };
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{_options.BaseUrl}/api/embeddings")
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{_provider.BaseUrl}/api/embeddings")
         {
             Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json")
         };

@@ -1,3 +1,5 @@
+namespace RagDemo.Infrastructure.Configuration;
+
 public sealed class RetrievalOptions
 {
     public int TopK { get; init; } = 3;

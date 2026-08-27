@@ -4,20 +4,26 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RagDemo.Domain.Contracts;
+using RagDemo.Infrastructure.Configuration;
 public sealed class OllamaChatCompletionService
     : IChatCompletionService
 {
     private readonly HttpClient _httpClient;
-    private readonly OllamaOptions _options;
+    private readonly ProviderOptions _provider;
     private readonly ILogger<OllamaChatCompletionService> _logger;
 
     public OllamaChatCompletionService(
         HttpClient httpClient,
-        IOptions<OllamaOptions> options,
+        IOptions<AiOptions> options,
         ILogger<OllamaChatCompletionService> logger)
     {
         _httpClient = httpClient;
-        _options = options.Value;
+        
+        var aiOptions = options.Value;
+        _provider =
+            aiOptions.Providers[
+            aiOptions.DefaultProvider];
+
         _logger = logger;
     }
 
@@ -27,13 +33,13 @@ public sealed class OllamaChatCompletionService
     {
         var request = new OllamaGenerateRequest
         {
-            Model = _options.ChatModel,
+            Model = _provider.ChatModel,
             Prompt = prompt,
             Stream = false
         };
 
         var response = await _httpClient.PostAsJsonAsync(
-            $"{_options.BaseUrl}/api/generate",
+            $"{_provider.BaseUrl}/api/generate",
             request,
             cancellationToken);
 
@@ -63,7 +69,7 @@ public sealed class OllamaChatCompletionService
     {
         var request = new OllamaGenerateRequest
         {
-            Model = _options.ChatModel,
+            Model = _provider.ChatModel,
             Prompt = prompt,
             Stream = true
         };
@@ -73,7 +79,7 @@ public sealed class OllamaChatCompletionService
 
         var httpRequest = new HttpRequestMessage(
             HttpMethod.Post,
-            $"{_options.BaseUrl}/api/generate")
+            $"{_provider.BaseUrl}/api/generate")
         {
             Content = JsonContent.Create(request)
         };

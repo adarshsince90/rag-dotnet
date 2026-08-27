@@ -267,6 +267,8 @@ The final system successfully achieved:
 
 ✅ 100% Grounding Accuracy
 
+---
+
 The evaluation demonstrates that the chatbot can reliably:
 
 Retrieve relevant information
@@ -276,3 +278,23 @@ Avoid hallucinations
 Answer document-based questions accurately
 
 The primary area for future improvement is retrieval precision and conversational entity-resolution, while overall system performance and answer quality are strong.
+
+---
+Ollama Results
+
+Faithfulness       : 100%
+Answer Correctness : 91.7%
+Context Recall     : 100%
+Context Precision  : 67%
+
+Average Retrieval  : 145 ms
+Average Generation : 43 sec
+
+Groq Results
+Faithfulness       : 100%
+Answer Correctness : 80%
+Context Recall     : 100%
+Context Precision  : 67.7%
+
+Average Retrieval  : 132 ms
+Average Generation : 1.6 sec

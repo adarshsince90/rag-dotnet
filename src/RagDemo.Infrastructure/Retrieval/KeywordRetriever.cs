@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
 using RagDemo.Domain.Contracts;
 using RagDemo.Domain.Models;
+using RagDemo.Infrastructure.Configuration;
 
 namespace RagDemo.Infrastructure.Retrieval;
 

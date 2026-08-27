@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Options;
 using RagDemo.Domain.Contracts;
+using RagDemo.Infrastructure.Configuration;
 
 namespace RagDemo.Infrastructure.Conversation;
 

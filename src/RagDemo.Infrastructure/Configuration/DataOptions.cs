@@ -1,3 +1,5 @@
+namespace RagDemo.Infrastructure.Configuration;
+
 public sealed class DataOptions
 {
     public string InputFile { get; init; } = string.Empty;

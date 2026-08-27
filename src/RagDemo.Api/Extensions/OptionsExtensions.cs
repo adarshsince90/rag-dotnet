@@ -1,5 +1,5 @@
+using RagDemo.Infrastructure.Configuration;
 using RagDemo.Infrastructure.Conversation;
-using RagDemo.Infrastructure.Storage.Qdrant;
 
 public static class OptionsExtensions
 {
@@ -7,8 +7,8 @@ public static class OptionsExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.Configure<OllamaOptions>(
-            configuration.GetSection("Ollama"));
+        // services.Configure<OllamaOptions>(
+        //     configuration.GetSection("Ollama"));
 
         services.Configure<DataOptions>(
             configuration.GetSection("Data"));
@@ -27,6 +27,9 @@ public static class OptionsExtensions
 
         services.Configure<EvaluationOptions>(
             configuration.GetSection(EvaluationOptions.SectionName));
+
+        services.Configure<AiOptions>(
+            configuration.GetSection("Ai"));
 
         return services;
     }

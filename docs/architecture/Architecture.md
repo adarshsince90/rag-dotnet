@@ -406,3 +406,37 @@ ConversationQuestionAnsweringService
                 │
                 ▼
 RAG Pipeline
+
+
+---
+# Sprint 11
+                  +-------------------+
+                  |   RagDemo.Cli     |
+                  +---------+---------+
+                            |
+                            v
+
+                  +-------------------+
+                  |   RagDemo.Api     |
+                  +---------+---------+
+                            |
+                            v
+
+         +----------------------------------+
+         | ConversationQuestionAnsweringSvc |
+         +----------------------------------+
+                            |
+           +----------------+----------------+
+           |                                 |
+           v                                 v
+
+   Retrieval Pipeline                 Chat Provider
+
+   Qdrant                              Ollama
+   Chunks                              Groq
+   Embeddings
+
+                            |
+                            v
+
+                         Answer

@@ -1,0 +1,215 @@
+{
+  "totalQuestions": 10,
+  "expectedSourceFoundCount": 10,
+  "expectedSourceCoverage": 1,
+  "averageKeywordCoverage": 0.8,
+  "groundingPasses": 10,
+  "groundingAccuracy": 1,
+  "averageRetrievalMs": 131.7,
+  "averageGenerationMs": 1618.6,
+  "averageHighestScore": 0.6768984258174896,
+  "results": [
+    {
+      "testCaseId": 1,
+      "category": "definition",
+      "conversationId": "eval-1",
+      "finalQuestion": "What is attention?",
+      "expectedSource": "attention-is-what-you-need.pdf",
+      "retrievedSources": [
+        "attention-is-what-you-need.pdf",
+        "transformer-limit.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 1,
+      "totalKeywords": 2,
+      "keywordCoverage": 0.5,
+      "highestScore": 0.645540714263916,
+      "generatedAnswer": "Attention is a mechanism that computes a weighted representation of a set of **values** based on how well each value’s associated **key** matches a given **query**.  \n\nIn practice the queries, keys, and values are packed into matrices **Q**, **K**, and **V**. The attention output is obtained by  \n\n\\[\n\\text{Attention}(Q,K,V)=\\operatorname{softmax}\\!\\left(\\frac{QK^{\\top}}{\\sqrt{d_k}}\\right)V,\n\\]\n\nwhere the matrix \\(QK^{\\top}\\) measures the compatibility (or similarity) between each query and each key, the scaling factor \\(1/\\sqrt{d_k}\\) stabilizes the dot‑product, and the softmax converts these scores into a set of weights that are then applied to the values **V**.\n\nTwo common forms of the compatibility function are:\n\n* **Additive attention** – uses a small feed‑forward network to compute the scores.  \n* **Dot‑product (multiplicative) attention** – directly uses the scaled dot product of queries and keys, which is faster and more space‑efficient because it can be implemented with optimized matrix multiplication.\n\nWhen the queries, keys, and values all come from the same sequence, the mechanism is called **self‑attention** (or intra‑attention). Self‑attention relates different positions within a single sequence to produce a contextual representation of that sequence, and it is a core component of models such as the Transformer, which also employs **multi‑head attention** (multiple parallel attention “heads”) to capture information from different representation subspaces.",
+      "retrievalMs": 689,
+      "generationMs": 3061,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 2,
+      "category": "definition",
+      "conversationId": "eval-2",
+      "finalQuestion": "What is self-attention?",
+      "expectedSource": "attention-is-what-you-need.pdf",
+      "retrievedSources": [
+        "attention-is-what-you-need.pdf",
+        "transformer-limit.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.7249335050582886,
+      "generatedAnswer": "Self‑attention (also called intra‑attention) is an attention mechanism that relates the different positions of a **single** sequence to one another in order to compute a representation of that sequence. In a self‑attention layer the queries, keys, and values are all derived from the same source (typically the output of the previous layer). Consequently, each position in the sequence can attend to every other position (subject to any causal or masking constraints) and combine the attended information to form its new representation. This mechanism is order‑independent, so positional information is added separately (e.g., via sinusoidal or relative position embeddings).",
+      "retrievalMs": 65,
+      "generationMs": 1099,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 3,
+      "category": "definition",
+      "conversationId": "eval-3",
+      "finalQuestion": "What is BERT?",
+      "expectedSource": "transformers-llm.pdf",
+      "retrievedSources": [
+        "bert-pretraining.pdf",
+        "transformers-llm.pdf",
+        "transformer-limit.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.626086950302124,
+      "generatedAnswer": "BERT (Bidirectional Encoder Representations from Transformers) is a deep, bidirectional language‑representation model built on the Transformer architecture. It is first pretrained on a large unlabeled text corpus by masking a random subset of input tokens and training the model to predict those masked tokens (the “masked language model” objective) and, in the original formulation, also to predict sentence‑pair relationships. After this pre‑training, BERT can be fine‑tuned on labeled downstream tasks, achieving strong performance across a wide range of natural‑language‑understanding benchmarks.",
+      "retrievalMs": 64,
+      "generationMs": 1712,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 4,
+      "category": "relationship",
+      "conversationId": "eval-4",
+      "finalQuestion": "How does attention help transformers?",
+      "expectedSource": "attention-is-what-you-need.pdf",
+      "retrievedSources": [
+        "attention-is-what-you-need.pdf",
+        "transformer-limit.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 1,
+      "totalKeywords": 2,
+      "keywordCoverage": 0.5,
+      "highestScore": 0.6951852440834045,
+      "generatedAnswer": "Attention is the core mechanism that enables the Transformer to represent sequences without using recurrent or convolutional layers.  \n- **Self‑attention (intra‑attention)** relates every position in a sequence to every other position, producing a weighted average of the whole sequence for each token. This gives the model a rich, context‑dependent representation of each word or element\u202F[attention‑is‑what‑you‑need.pdf].  \n- Because self‑attention is **order‑independent**, the Transformer adds explicit positional signals (sinusoidal or learned embeddings) so that positional information can be incorporated while still benefiting from the flexible, set‑based computation\u202F[transformer‑limit.pdf].  \n- The mechanism is **parallelizable**: all tokens attend to the full sequence simultaneously, unlike RNNs that must process tokens step‑by‑step. This makes training faster and scales well to long inputs.  \n- By splitting attention into multiple independent “heads,” the model can capture different types of relationships (e.g., syntactic, semantic) in parallel, and the concatenated heads are further processed by feed‑forward layers\u202F[transformer‑limit.pdf].  \n\nIn short, attention lets the Transformer compute powerful, context‑aware token representations efficiently, replacing the need for sequence‑aligned recurrence or convolution and thereby improving both performance and scalability.",
+      "retrievalMs": 93,
+      "generationMs": 1934,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 5,
+      "category": "relationship",
+      "conversationId": "eval-5",
+      "finalQuestion": "What are the advantages of transformers over RNNs?",
+      "expectedSource": "attention-is-what-you-need.pdf",
+      "retrievedSources": [
+        "attention-is-what-you-need.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.666175365447998,
+      "generatedAnswer": "The documents highlight several concrete benefits of using the Transformer architecture instead of recurrent neural networks (RNNs):\n\n1. **No Recurrence or Convolutions** – The Transformer is built solely on attention mechanisms, completely dispensing with the recurrent connections that RNNs rely on. This simplifies the model structure.\n\n2. **Greater Parallelism** – Because each element of a sequence can attend to every other element simultaneously, the whole sequence can be processed in parallel. In contrast, RNNs must handle tokens step‑by‑step, which limits parallel execution.\n\n3. **Faster Training** – The increased parallelism translates into significantly less training time. The paper notes that the Transformer reaches state‑of‑the‑art results on translation tasks while requiring only a “small fraction of the training costs of the best models from the literature.”\n\n4. **Higher Quality Outputs** – Empirical results show that Transformers achieve superior performance (e.g., higher BLEU scores on WMT translation benchmarks and better F1 on constituency parsing) compared with RNN‑based sequence‑to‑sequence models.\n\n5. **Better Scaling with Model Size** – The authors observe that larger Transformer models tend to perform better, and dropout helps avoid over‑fitting, indicating that the architecture scales well.\n\n6. **Effective on Long‑Range Dependencies** – Self‑attention allows each token to directly attend to any other token, handling long output sequences (e.g., constituency parsing) more effectively than RNNs, which struggle with long‑range dependencies.\n\nTogether, these points illustrate why Transformers are considered advantageous over traditional RNNs for many sequence modeling tasks.",
+      "retrievalMs": 72,
+      "generationMs": 1773,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 6,
+      "category": "concept",
+      "conversationId": "eval-6",
+      "finalQuestion": "What is in-context learning?",
+      "expectedSource": "language-model-few-shots.pdf",
+      "retrievedSources": [
+        "language-model-few-shots.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 1,
+      "totalKeywords": 2,
+      "keywordCoverage": 0.5,
+      "highestScore": 0.7327995896339417,
+      "generatedAnswer": "In‑context learning is the **inner‑loop** of meta‑learning for language models.  \nDuring inference the model receives a text prompt that contains a natural‑language description of the task and/or a few demonstration examples.\u202FWithout any weight updates, the model uses the information present in that prompt to adapt its predictions and complete further instances of the same task, simply by predicting the next tokens. This process happens within the forward‑pass on each input sequence. (Sources: language‑model‑few‑shots.pdf)",
+      "retrievalMs": 77,
+      "generationMs": 1129,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 7,
+      "category": "concept",
+      "conversationId": "eval-7",
+      "finalQuestion": "What is few-shot learning?",
+      "expectedSource": "language-model-few-shots.pdf",
+      "retrievedSources": [
+        "language-model-few-shots.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 1,
+      "totalKeywords": 2,
+      "keywordCoverage": 0.5,
+      "highestScore": 0.7788200974464417,
+      "generatedAnswer": "Few‑shot learning, as described in the provided documents, is a way of using a pre‑trained language model to perform a new task by giving it only a small number of task demonstrations (typically\u202F10–100 examples) at inference time. The model has already learned a broad distribution of tasks during its pre‑training, and it can rapidly adapt to a new task by “in‑context” learning from these few examples, without any additional gradient updates. This approach greatly reduces the amount of task‑specific data that must be collected, though it generally performs slightly worse than fully fine‑tuned models.",
+      "retrievalMs": 65,
+      "generationMs": 1755,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 10,
+      "category": "memory",
+      "conversationId": "memory-test-1",
+      "finalQuestion": "How does it help transformers?",
+      "expectedSource": "attention-is-what-you-need.pdf",
+      "retrievedSources": [
+        "transformer-limit.pdf",
+        "attention-is-what-you-need.pdf",
+        "transformers-llm.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.6035206317901611,
+      "generatedAnswer": "Attention, and specifically **self‑attention**, is the core mechanism that makes the Transformer effective.  \nThe documents describe several ways it helps the model:\n\n1. **Replaces each token with a weighted summary of the whole sequence** –  \n   *“Self‑attention … processes a sequence by replacing each element by a weighted average of the rest of the sequence.”* (transformer‑limit.pdf).  \n   This lets every position directly incorporate information from any other position, giving the model a rich, context‑aware representation.\n\n2. **Captures long‑range dependencies without the constraints of recurrent or convolutional architectures** –  \n   Because the operation is *order‑independent* (it works on sets), the model does not have to process tokens strictly left‑to‑right; instead it can relate distant tokens in a single step (transformer‑limit.pdf).\n\n3. **Enables parallel computation** –  \n   Since the attention scores for all pairs of queries and keys are computed together as matrix multiplications, the whole sequence can be processed simultaneously, unlike RNNs that must step through time sequentially (implied by the description of self‑attention as a matrix operation).\n\n4. **Supports flexible positioning through explicit position signals** –  \n   Because self‑attention itself does not encode order, the Transformer adds sinusoidal or learned (or relative) position embeddings so that the model knows where each token occurs (transformer‑limit.pdf).\n\n5. **Allows multi‑head attention**, where several independent attention “heads” learn different aspects of the relationships and their outputs are concatenated before further processing (transformer‑limit.pdf).  \n\n6. **Facilitates the encoder‑decoder workflow** –  \n   In the decoder, a *causal* (autoregressive) self‑attention mask ensures that each output token can only attend to previously generated tokens, preserving the auto‑regressive generation property (transformer‑limit.pdf).\n\nTogether, these properties give the Transformer the ability to model complex, global interactions among tokens efficiently, which is why attention is considered the key ingredient that makes Transformers powerful for sequence‑to‑sequence and other NLP tasks.",
+      "retrievalMs": 81,
+      "generationMs": 2198,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 11,
+      "category": "memory",
+      "conversationId": "memory-test-2",
+      "finalQuestion": "How does it differ from GPT?",
+      "expectedSource": "language-model-few-shots.pdf",
+      "retrievedSources": [
+        "language-model-few-shots.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 2,
+      "totalKeywords": 2,
+      "keywordCoverage": 1,
+      "highestScore": 0.6630094051361084,
+      "generatedAnswer": "I could not find the answer in the provided documents.\nSupported topics currently include:\n- Transformers\n- Attention Mechanisms\n- BERT\n- GPT\n- Few-shot Learning",
+      "retrievalMs": 61,
+      "generationMs": 1056,
+      "groundingPassed": true
+    },
+    {
+      "testCaseId": 12,
+      "category": "grounding",
+      "conversationId": "eval-12",
+      "finalQuestion": "What is human attention?",
+      "expectedSource": "",
+      "retrievedSources": [
+        "attention-is-what-you-need.pdf",
+        "transformer-limit.pdf"
+      ],
+      "expectedSourceFound": true,
+      "matchedKeywords": 0,
+      "totalKeywords": 0,
+      "keywordCoverage": 1,
+      "highestScore": 0.6329127550125122,
+      "generatedAnswer": "I could not find the answer in the provided documents.\nSupported topics currently include:\n- Transformers\n- Attention Mechanisms\n- BERT\n- GPT\n- Few-shot Learning",
+      "retrievalMs": 50,
+      "generationMs": 469,
+      "groundingPassed": true
+    }
+  ],
+  "faithfulness": 1,
+  "answerCorrectness": 0.8,
+  "contextRecall": 1,
+  "contextPrecision": 0.6768984258174896
+}

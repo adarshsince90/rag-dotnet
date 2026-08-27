@@ -1,4 +1,4 @@
-namespace RagDemo.Infrastructure.Storage.Qdrant;
+namespace RagDemo.Infrastructure.Configuration;
 
 public sealed class QdrantOptions
 {

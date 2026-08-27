@@ -45,15 +45,6 @@ public static class ServiceCollectionExtensions
                     client.Timeout =
                         TimeSpan.FromMinutes(10);
                 });
-
-        services.AddHttpClient<
-            IChatCompletionService,
-            OllamaChatCompletionService>(
-                client =>
-                {
-                    client.Timeout =
-                        TimeSpan.FromMinutes(10);
-                });
                 
         services.AddScoped<IPromptBuilder,
             RagPromptBuilder>();

@@ -9,7 +9,8 @@ builder.Services.AddHealthChecks();
 builder.Services
 	.AddOptionsConfiguration(builder.Configuration)
 	.AddApplicationServices()
-	.AddInfrastructureServices();
+	.AddInfrastructureServices()
+    .AddAiServices(builder.Configuration);
 
 builder.Services.AddCors(options =>
 {

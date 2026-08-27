@@ -105,3 +105,33 @@ Highest Score  : 0.72
 Sources:
  • attention-is-what-you-need.pdf
 ```
+
+
+## AI Providers
+
+The application supports multiple AI providers through configuration.
+
+Current providers:
+
+- Local Ollama
+- Groq
+
+Provider selection is controlled through configuration:
+
+```json
+{
+  "Ai": {
+    "DefaultProvider": "local"
+  }
+}
+```
+
+## groq setup 
+setup API key in env var:
+
+```
+dotnet user-secrets set \
+"Ai:Providers:groq:ApiKey" \
+"gsk_xxxxxxxxx" \
+--project src/RagDemo.Api
+```

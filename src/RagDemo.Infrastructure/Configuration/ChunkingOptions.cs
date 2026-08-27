@@ -1,3 +1,5 @@
+namespace RagDemo.Infrastructure.Configuration;
+
 public sealed class ChunkingOptions
 {
     public const string SchemaName = "Chunking";
