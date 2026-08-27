@@ -51,6 +51,8 @@ while (true)
         "/exit",
         StringComparison.OrdinalIgnoreCase))
         {
+             AnsiConsole.MarkupLine(
+            "\n[yellow]Shutting down...[/]");
             return;
         }
 
@@ -69,6 +71,16 @@ while (true)
         continue;
     }
 
+    Console.CancelKeyPress += (_, eventArgs) =>
+    {
+        eventArgs.Cancel = true;
+
+        AnsiConsole.MarkupLine(
+            "\n[yellow]Shutting down...[/]");
+
+        Environment.Exit(0);
+    };
+
     Console.WriteLine();
 
     Console.ForegroundColor =
@@ -81,11 +93,17 @@ while (true)
 
     Console.WriteLine();
 
-    await StreamResponseAsync(
-        httpClient,
-        conversationId,
-        question);
-
+    try
+    {
+        await StreamResponseAsync(
+            httpClient,
+            conversationId,
+            question);
+    }
+    catch (Exception ex)
+    {
+        RenderError(ex);
+    }
     Console.WriteLine();
 }
 
@@ -118,7 +136,15 @@ static async Task StreamResponseAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead);
 
-    response.EnsureSuccessStatusCode();
+    if (!response.IsSuccessStatusCode)
+    {
+        var error =
+            await response.Content
+                .ReadAsStringAsync();
+
+        throw new InvalidOperationException(
+            $"API Error ({(int)response.StatusCode}): {error}");
+    }
 
     await using var stream =
         await response.Content.ReadAsStreamAsync();
@@ -137,12 +163,10 @@ static async Task StreamResponseAsync(
     RetrievalMetrics? retrieval = null;
 
     GenerationDiagnostics? completion = null;
-
-    while (!reader.EndOfStream)
+    string? line;
+    while ((line = await reader.ReadLineAsync()) is not null)
+    //while(!reader.EndOfStream)
     {
-        var line =
-            await reader.ReadLineAsync();
-
         if (string.IsNullOrWhiteSpace(line))
         {
             continue;
@@ -170,18 +194,33 @@ static async Task StreamResponseAsync(
         {
             case "retrieval":
 
-                retrieval =
-                    JsonSerializer.Deserialize<
-                        RetrievalMetrics>(data);
+                try
+                {
+                    retrieval =
+                        JsonSerializer.Deserialize<
+                            RetrievalMetrics>(
+                                data);
+                }
+                catch
+                {
+                    // Ignore malformed event
+                }
 
                 break;
 
             case "completed":
 
-                completion =
+                try
+                {
+                    completion =
                     JsonSerializer.Deserialize<
                         GenerationDiagnostics>(
                             data);
+                }
+                catch
+                {
+                    // Ignore malformed event
+                }
 
                 break;
 
@@ -327,4 +366,47 @@ static void RenderGenerationTable(
             .ToString());
 
     AnsiConsole.Write(table);
+}
+
+static void RenderError(
+    Exception exception)
+{
+    var message =
+        exception switch
+        {
+            HttpRequestException =>
+                """
+Unable to connect to RagDemo API.
+
+Please verify:
+
+ • RagDemo.Api is running
+ • API URL is correct
+ • Network connectivity is available
+""",
+
+            TaskCanceledException =>
+                """
+The request timed out.
+
+Possible causes:
+
+ • Ollama generation is taking too long
+ • API is unavailable
+""",
+
+            _ =>
+                exception.Message
+        };
+
+    AnsiConsole.Write(
+        new Panel(message)
+        {
+            Header =
+                new PanelHeader(
+                    "[red]Error[/]")
+        }
+        .Border(BoxBorder.Rounded)
+        .BorderStyle(
+            new Style(Color.Red)));
 }
