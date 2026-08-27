@@ -392,3 +392,17 @@ Evaluation Service
 ConversationQuestionAnsweringService
         ↓
 RAG Pipeline
+
+---
+# Sprint 10
+
+          RagDemo.Cli
+                │
+                ▼
+/conversation/stream
+                │
+                ▼
+ConversationQuestionAnsweringService
+                │
+                ▼
+RAG Pipeline

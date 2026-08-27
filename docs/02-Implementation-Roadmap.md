@@ -558,3 +558,13 @@ Automated Benchmarking ✅
 Dataset (12 Questions) ✅
 Results Documentation ✅
 PDF Extraction Improvement ✅
+
+---
+
+Optional Future scope:
+- Better query classification
+- Query rewriting
+- Similarity threshold experimentation
+- Better memory-aware retrieval
+- Source citations inside answers
+- Cloud model migration

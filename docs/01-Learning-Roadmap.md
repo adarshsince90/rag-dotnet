@@ -114,4 +114,6 @@ Production Hardening
 
 ✅ Sprint 8 - Evaluation & Testing
 
-⬜ Sprint 9 - Production Hardening
+✅ Sprint 9 - Production Hardening - Refactoring
+
+✅ Sprint 10 - Interactive Console Client
