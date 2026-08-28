@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "master", "**" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  dotnet-build:
+    name: Build .NET Projects
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 10 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        dotnet-quality: 'preview'
+
+    - name: Restore Dependencies
+      run: |
+        dotnet restore src/RagDemo.Api/RagDemo.Api.csproj
+        dotnet restore src/RagDemo.Cli/RagDemo.Cli.csproj
+
+    - name: Build API & CLI
+      run: |
+        dotnet build src/RagDemo.Api/RagDemo.Api.csproj --configuration Release --no-restore
+        dotnet build src/RagDemo.Cli/RagDemo.Cli.csproj --configuration Release --no-restore
+
+  docker-validate:
+    name: Validate Docker & Compose
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Validate Docker Compose Configuration
+      run: docker compose -f infrastructure/docker-compose.yml config
+
+    - name: Test Docker Build
+      run: docker build -f infrastructure/api/Dockerfile -t ragdemo-api:test .
