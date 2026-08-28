@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>RAG Assistant</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link href="/css/chat.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+</head>
+
+<body>
+
+    <div class="main-container">
+
+       <div class="header">
+
+            <div>
+                <h2>🤖 RAG Assistant</h2>
+                <div id="conversation-label" class="conversation-label">
+                </div>
+            </div>
+
+            <button
+                id="new-chat-btn"
+                class="btn btn-outline-secondary">
+                New Chat
+            </button>
+
+        </div>
+
+        <div id="chat-container"
+             class="chat-container">
+
+            <div class="welcome-message">
+
+                <h3>🤖 RAG Assistant</h3>
+
+                <p>
+                    Ask questions about the documents
+                    currently indexed in the knowledge base.
+                </p>
+
+                <div class="example-prompts">
+
+                    <div class="prompt">
+                        What is self-attention?
+                    </div>
+
+                    <div class="prompt">
+                        Summarize the Transformer architecture.
+                    </div>
+
+                    <div class="prompt">
+                        What limitations are discussed?
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="input-panel">
+
+            <input id="question-input"
+                   type="text"
+                   class="form-control"
+                   placeholder="Ask a question..." />
+
+            <button id="send-btn"
+                    class="btn btn-primary">
+                Send
+            </button>
+
+        </div>
+
+    </div>
+    <script src="/js/chat.js"></script>
+</body>
+</html>

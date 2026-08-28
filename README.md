@@ -135,3 +135,21 @@ dotnet user-secrets set \
 "gsk_xxxxxxxxx" \
 --project src/RagDemo.Api
 ```
+
+## Browser Chat UI
+
+The project includes a lightweight browser-based chat interface.
+
+### Features
+
+- Streaming responses
+- Conversation memory
+- Source attribution
+- Retrieval diagnostics
+
+### Launch
+
+Start the API:
+
+```bash
+dotnet run --project src/RagDemo.Api
