@@ -29,6 +29,7 @@ Architecture setup only.
 
 A RAG system should depend on abstractions, not implementations.
 
-## Next Sprint
+## Related
 
-Implement keyword-based retrieval.
+- **ADRs**: [ADR-001 Dependency Inversion](../adr/ADR-001-dependency-inversion.md)
+- **Next Sprint**: [Sprint 01 — Keyword Retrieval](Sprint-01.md)

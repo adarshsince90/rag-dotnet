@@ -99,3 +99,12 @@ The system successfully retrieves relevant content using keyword matching and de
 
 
 Sprint 1 established the foundational retrieval pipeline and validated the project's architecture. Although simple keyword retrieval produced acceptable results for direct matches, the observed limitations around semantic understanding demonstrated the need for embeddings and vector search. This sprint successfully clarified the distinction between retrieval and generation, which is a core concept for understanding modern RAG systems.
+
+---
+
+## Related
+
+- **ADRs**: [ADR-006 Document Metadata](../adr/ADR-006-document-metadata.md)
+- **Concepts**: [Retrieval](../concepts/01-Retrieval.md)
+- **Previous Sprint**: [Sprint 00 — Foundation](Sprint-00.md)
+- **Next Sprint**: [Sprint 02 — Ranking & Diagnostics](Sprint-02.md)

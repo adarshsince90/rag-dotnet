@@ -124,3 +124,12 @@ Visibility into retrieval behavior helps explain why chunks were selected.
 ## Conclusion
 
 Sprint 2 expanded the retrieval engine from simple chunk lookup into a ranked retrieval system with diagnostic capabilities. The observed ranking limitations justify moving toward embeddings and semantic search in future sprints.
+
+---
+
+## Related
+
+- **ADRs**: [ADR-004 Retrieval Metadata](../adr/ADR-004-retrieval-metadata.md), [ADR-005 Top-K Retrieval](../adr/ADR-005-topk-retrieval.md), [ADR-010 Centralized Retrieval](../adr/ADR-010-retrieval-processing.md)
+- **Concepts**: [Ranking](../concepts/02-Ranking.md)
+- **Previous Sprint**: [Sprint 01 — Keyword Retrieval](Sprint-01.md)
+- **Next Sprint**: [Sprint 03 — Embeddings](Sprint-03.md)

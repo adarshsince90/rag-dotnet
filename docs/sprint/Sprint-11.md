@@ -101,3 +101,9 @@ Approximately 26x faster.
 - Model selection UI
 - Provider benchmarking dashboard
 - Cloud embedding providers
+---
+
+## Related
+
+- **Previous Sprint**: [Sprint 10 — Console Client](Sprint-10.md)
+- **Next Sprint**: [Sprint 12 — Browser Chat UI](Sprint-12.md)

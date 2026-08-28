@@ -31,3 +31,9 @@ Exit application
 - Demo-friendly
 - Works without browser UI
 - Useful during development
+---
+
+## Related
+
+- **Previous Sprint**: [Sprint 09A — Production Hardening](Sprint-09A.md)
+- **Next Sprint**: [Sprint 11 — Multi-Provider AI](Sprint-11.md)

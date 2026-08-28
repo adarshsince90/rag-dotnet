@@ -1,67 +1,98 @@
-RagDemo.Infrastructure
+# Architecture Reference & Retrieval Heuristics
+
+## Project Structure & Component Map
+
+```text
+src/
+├── RagDemo.Api/
+│   ├── Endpoints/
+│   │   ├── ConversationEndpoints.cs    # /conversation/stream, /api-conversation/stream
+│   │   ├── AskEndpoints.cs             # /ask, /ask/stream
+│   │   ├── RetrievalEndpoints.cs       # /retrieve
+│   │   ├── IngestionEndpoints.cs       # /generate-embeddings
+│   │   ├── EvaluationEndpoints.cs      # /evaluation/run
+│   │   └── HealthEndpoints.cs          # /health
+│   ├── Extensions/
+│   │   └── ServiceCollectionExtensions.cs # DI registrations & provider resolution
+│   └── wwwroot/                        # Browser chat UI (index.html, styles, app.js)
 │
-├── Retrieval
-│   ├── TextFileChunkProvider.cs
-│   ├── KeywordRetriever.cs
-│   └── VectorRetriever.cs
+├── RagDemo.Application/
+│   ├── Services/
+│   │   ├── ConversationQuestionAnsweringService.cs
+│   │   ├── QuestionAnsweringService.cs
+│   │   ├── RetrievalService.cs
+│   │   ├── GenerateEmbeddingsService.cs
+│   │   └── EvaluationService.cs
+│   └── Prompts/
+│       ├── RagPromptBuilder.cs
+│       └── ConversationQueryBuilder.cs
 │
-├── Embeddings
-│   ├── Ollama
-│   │   ├── OllamaEmbeddingGenerator.cs
-│   │   ├── OllamaOptions.cs
-│   │   └── OllamaEmbeddingResponse.cs
-│   │
-│   └── OpenAI
-│       ├── OpenAiEmbeddingGenerator.cs
-│       └── OpenAiOptions.cs
+├── RagDemo.Domain/
+│   ├── Interfaces/
+│   │   ├── IChatCompletionService.cs
+│   │   ├── IEmbeddingGenerator.cs
+│   │   ├── IVectorStore.cs
+│   │   ├── IRetriever.cs
+│   │   ├── IConversationMemory.cs
+│   │   ├── IDocumentExtractor.cs
+│   │   └── IChunkingStrategy.cs
+│   └── Models/
+│       ├── DocumentChunk.cs
+│       ├── ScoredChunk.cs
+│       └── ChatMessage.cs
 │
-├── Chat
-│   ├── Ollama
-│   │   ├── OllamaChatModel.cs
-│   │   └── OllamaChatResponse.cs
-│   │
-│   └── OpenAI
-│       └── OpenAiChatModel.cs
+├── RagDemo.Infrastructure/
+│   ├── AI/
+│   │   ├── Ollama/ (Chat & Embeddings)
+│   │   └── Groq/ (Cloud Chat)
+│   ├── VectorStore/
+│   │   ├── QdrantVectorStore.cs
+│   │   └── InMemoryVectorStore.cs
+│   ├── Ingestion/
+│   │   ├── PdfDocumentExtractor.cs
+│   │   └── CharacterChunkingStrategy.cs
+│   └── Memory/
+│       └── InMemoryConversationMemory.cs
 │
-└── Documents
-    ├── Text
-    │   └── TextFileChunkProvider.cs
-    │
-    └── Pdf
-        └── PdfChunkProvider.cs
+└── RagDemo.Cli/
+    └── Program.cs                      # Interactive console terminal client
+```
 
--------------------------------------
-What Production Systems Often Do
+---
 
-Instead of:
+## API Endpoints Summary
 
-C#
-1
-score > 0.7
-Show more lines
+| Endpoint | Method | Payload / Response | Description |
+|---|---|---|---|
+| `/conversation/stream` | POST | `{ "conversationId": "...", "question": "..." }` ➔ SSE | Recommended multi-turn conversational streaming |
+| `/api-conversation/stream`| POST | `{ "conversationId": "...", "question": "..." }` ➔ SSE | API-optimized conversational streaming |
+| `/ask` | POST | `{ "question": "..." }` ➔ JSON `{ "answer", "diagnostics" }` | Single-turn non-streaming RAG |
+| `/ask/stream` | POST | `{ "question": "..." }` ➔ SSE | Single-turn streaming RAG |
+| `/retrieve` | POST | `{ "query": "...", "topK": 3 }` ➔ JSON `{ "chunks" }` | Pure retrieval without LLM generation |
+| `/generate-embeddings` | POST | Trigger ingestion pipeline | Ingests PDFs from `data/Raw`, chunks, and upserts to Qdrant |
+| `/evaluation/run` | POST | Runs 12-question benchmark suite | Returns JSON metrics for relevance, accuracy, and latency |
+| `/health` | GET | `200 OK` | Service and dependency health status |
 
-they use multiple signals:
+---
 
-Signal 1
+## Production Retrieval Signals
 
-Similarity score.
+Instead of relying solely on a single static similarity threshold (e.g. `score > 0.70`), the engine evaluates composite retrieval signals:
 
-Signal 2
+1. **Signal 1 — Absolute Similarity Score**: Cosine similarity score of Top-1 chunk.
+2. **Signal 2 — Top-1 vs Top-2 Delta**: Difference in similarity score between first and second ranked items.
+3. **Signal 3 — Rank-1 vs Median Delta**: Score distance separating top match from background noise.
+4. **Signal 4 — Exact Entity / Keyword Matching**: Hybrid reinforcement for exact dates, entity names, and acronyms.
 
-Difference between Rank 1 and Rank 2.
+---
 
-Signal 3
+## Sample Query Similarity Benchmark
 
-Difference between Rank 1 and Median score.
-
-Signal 4
-
-Presence of exact entity matches.
-
----------------------------------
-Query	Best ScoreWhere are headquarters?	0.82
-Company location	0.79
-Founded in?	0.88
-Google CEO	0.50
-Weather today	0.44
-Capital of France	0.42
+| Query | Top Match Score | Categorization | Outcome |
+|---|---|---|---|
+| *Where are headquarters?* | `0.82` | In-Domain / High Confidence | Context retrieved & grounded answer generated |
+| *Company location* | `0.79` | In-Domain / Semantic Match | Context retrieved & grounded answer generated |
+| *Founded in?* | `0.88` | In-Domain / High Confidence | Context retrieved & grounded answer generated |
+| *Google CEO* | `0.50` | Out of Domain / Low Relevance | Fallback rejection / Hallucination prevention |
+| *Weather today* | `0.44` | Out of Domain / Unrelated | Fallback rejection / Hallucination prevention |
+| *Capital of France* | `0.42` | Out of Domain / Unrelated | Fallback rejection / Hallucination prevention |

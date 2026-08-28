@@ -2,9 +2,21 @@
 
 ## Overview
 
-The application follows a layered architecture that separates API concerns, application workflows, business contracts, and infrastructure implementations.
+The application follows Clean Architecture with four layers that separate API concerns, application workflows, business contracts, and infrastructure implementations.
 
-The primary goal is to allow the RAG system to evolve incrementally from simple keyword retrieval to embeddings, vector search, PDF processing, open-source LLM integration, conversational memory, and evaluation without significant refactoring.
+```
+src/
+├── RagDemo.Api              → HTTP endpoints, DI, middleware
+├── RagDemo.Application      → Orchestration, services, prompt building
+├── RagDemo.Domain           → Interfaces, models, contracts
+├── RagDemo.Infrastructure   → Ollama, Groq, Qdrant, PDF, memory
+└── RagDemo.Cli              → Interactive console client
+```
+
+- **Application** owns the workflow
+- **Infrastructure** owns the implementation
+- **Domain** owns the contracts
+- **API** owns the transport
 
 ---
 
@@ -12,431 +24,182 @@ The primary goal is to allow the RAG system to evolve incrementally from simple 
 
 ### API Layer (RagDemo.Api)
 
-Responsible for:
-
-- HTTP endpoints
+- HTTP endpoints (Minimal APIs)
 - Request/response handling
-- Swagger/OpenAPI
+- OpenAPI / Scalar documentation
 - Input validation
 - Dependency injection configuration
+- CORS, middleware, static files
 
-The API layer should not contain business logic or infrastructure implementation details.
+The API layer does not contain business logic or infrastructure details.
 
-Example:
+### Application Layer (RagDemo.Application)
 
-POST /ask
+- RAG pipeline orchestration
+- Prompt construction (`RagPromptBuilder`)
+- Query classification
+- Retrieval service coordination
+- Embedding generation orchestration
+- Evaluation service
 
-## Current Retrieval Flow
+### Domain Layer (RagDemo.Domain)
 
-Question
-↓
-Application Service
-↓
-Chunk Provider
-↓
-Retriever
-↓
-Retrieval Result
-↓
-Response
+- Interface contracts for all infrastructure concerns
+- Domain models (`DocumentChunk`, `ConversationTurn`, `RetrievalResult`, etc.)
+- Evaluation models and contracts
 
-Application owns the workflow.
+### Infrastructure Layer (RagDemo.Infrastructure)
 
-Infrastructure owns the implementation.
-
-Domain owns the contracts.
-
-API owns the transport.
-
-## Current Implementations
-
-IChunkProvider
-→ TextFileChunkProvider
-
-IRetriever
-→ KeywordRetriever
-
-
-## Current Retrieval Architecture
-
-User
-↓
-API
-↓
-AskQuestionService
-↓
-IChunkProvider
-↓
-IRetriever
-↓
-RetrievalResponse
-↓
-Response DTOs
-↓
-API Response
+- LLM providers (Ollama, Groq)
+- Embedding generation (Ollama / nomic-embed-text)
+- Vector storage (Qdrant)
+- PDF document extraction (PdfPig)
+- Chunking strategies
+- Conversation memory (in-memory)
+- Evaluation dataset provider
 
 ---
 
-## Retrieval Layer
+## Interface → Implementation Map
 
-The retriever is responsible for:
-
-- Evaluating chunks
-- Calculating scores
-- Ranking results
-- Applying Top-K selection
-- Producing retrieval diagnostics
-
-The retriever is not responsible for:
-
-- HTTP concerns
-- User-facing messages
-- API formatting
-
----
-
-## Current Retrieval Models
-
-DocumentChunk
-
-Contains:
-
-- Id
-- Content
-- Source
-- ChunkIndex
-
-RetrievalResult
-
-Contains:
-
-- Chunk
-- Score
-- Rank
-
-RetrievalResponse
-
-Contains:
-
-- Results
-- Diagnostics
-
-RetrievalDiagnostics
-
-Contains:
-
-- TotalChunks
-- QualifiedChunks
-- ReturnedChunks
-- TopK
-
-## Embedding Architecture
-
-Document
-↓
-IChunkProvider
-↓
-DocumentChunk
-↓
-IEmbeddingGenerator
-↓
-Embedding Generation
-↓
-IChunkStore
-↓
-IRetriever
-↓
-Retrieval Results
+| Domain Interface | Infrastructure Implementation | Purpose |
+|-----------------|------------------------------|---------|
+| `IChatCompletionService` | `OllamaChatCompletionService`, `GroqChatCompletionService` | LLM generation |
+| `IRetriever` | `VectorRetriever` | Vector search |
+| `IEmbeddingGenerator` | `OllamaEmbeddingGenerator` | Embedding generation |
+| `IVectorStore` | `QdrantVectorStore` | Persistent vector storage |
+| `IChunkProvider` | `PdfChunkProvider` | Document chunking |
+| `IChunkingStrategy` | `CharacterChunkingStrategy` | Chunking algorithm |
+| `IDocumentExtractor` | `PdfDocumentExtractor` | PDF text extraction |
+| `IPromptBuilder` | `RagPromptBuilder` | Prompt construction |
+| `IConversationMemory` | `InMemoryConversationMemory` | Conversation history |
+| `IConversationQueryBuilder` | `ConversationQueryBuilder` | History-aware queries |
+| `IRetrievalResultProcessor` | `RetrievalResultProcessor` | Ranking and filtering |
+| `IChunkStore` | `InMemoryChunkStore` | In-memory chunk cache |
+| `IEvaluationService` | `EvaluationService` | Automated benchmarking |
+| `IEvaluationDatasetProvider` | `JsonEvaluationDatasetProvider` | Test dataset loading |
 
 ---
 
-## Current Infrastructure Components
+## Conversational RAG Pipeline
 
-Embeddings
+The primary pipeline used by the chat UI, CLI, and evaluation:
 
-- OllamaEmbeddingGenerator
-
-Storage
-
-- InMemoryChunkStore
-
-Retrieval
-
-- VectorRetriever
-- RetrievalResultProcessor
-
-## Current RAG Architecture
-
-API
-↓
-QuestionAnsweringService
-
-├── IRetriever
-├── IPromptBuilder
-└── IChatCompletionService
-
-↓
-
-Infrastructure
-
-- VectorRetriever
-- OllamaEmbeddingGenerator
-- OllamaChatCompletionService
-
-↓
-
-Ollama
-
-- nomic-embed-text
-- gemma2:2b
-
----
-## Sprint 5B
-
-The bottleneck of a RAG system is not always retrieval.
-
-For document-heavy systems:
-
-Document Processing
-  ↓
-Chunking
-  ↓
-Embedding Generation
-  ↓
-Storage
-
-often costs significantly more than query-time retrieval.
-
-This motivates persistent vector storage.
-
-### Architectural Validation
-
-Sprint 5B demonstrated the value of separation of concerns.
-
-Only the document acquisition layer changed:
-
-TXT
-↓
-TextFileChunkProvider
-
-became
-
-PDF
-↓
-PdfDocumentExtractor
-↓
-PdfChunkProvider
-
-The following components remained unchanged:
-
-- Chunking Strategies
-- Embedding Generation
-- InMemoryChunkStore
-- VectorRetriever
-- Prompt Builder
-- Question Answering Service
-- Chat Completion Service
-
-This validated that document ingestion was correctly isolated from retrieval and generation concerns.
-
----
-
-## Vector Database Layer
-
-Sprint 6 introduced Qdrant as the vector database.
-
-Architecture:
-
-Question
-↓
+```
+ConversationId + Question
+        ↓
+QueryClassifier
+   ├── Greeting → Direct response (no retrieval)
+   ├── Capabilities → Direct response (no retrieval)
+   └── DocumentQuestion ↓
+        ↓
+Load Conversation History (last 4 turns)
+        ↓
+Build Retrieval Query (previous questions + current)
+        ↓
 VectorRetriever
-↓
-Qdrant
-↓
-Retrieved Chunks
-↓
-Prompt Builder
-↓
-LLM
-
-Responsibilities:
-
-Qdrant:
-
-- Persistent Vector Storage
-- Approximate Nearest Neighbour Search
-- Metadata Storage
-
-VectorRetriever:
-
-- Query Embedding Generation
-- Retrieval Orchestration
-
-RetrievalResultProcessor:
-
-- Similarity Filtering
-- Ranking
-- Diagnostic Calculations
-
-This separation preserves clean architecture boundaries while enabling future retrieval enhancements.
+   ├── Embed question (nomic-embed-text, 768d)
+   ├── Qdrant search (top 10 candidates)
+   └── RetrievalResultProcessor (filter ≥ 0.55, top 5)
+        ↓
+RagPromptBuilder
+   ├── System instructions (grounded prompting)
+   ├── Conversation history
+   ├── Retrieved document context
+   └── User question
+        ↓
+LLM (Ollama or Groq)
+        ↓
+SSE Streaming Response
+        ↓
+Store conversation turn in memory
+```
 
 ---
 
-# Conversational RAG Architecture
+## Ingestion Pipeline
 
-Sprint 7B introduced conversational memory capabilities.
+Triggered via `POST /generate-embeddings`:
 
-The system now supports:
-
-- Single-turn RAG
-- Multi-turn Conversational RAG
-- Streaming Responses
-
----
-
-## Standard RAG Flow
-
-Question
-↓
-Retrieval
-↓
-Prompt Construction
-↓
-LLM
-↓
-Response
-
-Endpoints:
-
-POST /ask
-
-POST /ask/stream
+```
+PDF Documents (data/raw/pdf/)
+        ↓
+PdfDocumentExtractor (PdfPig)
+        ↓
+CharacterChunkingStrategy (1000 chars, 200 overlap)
+        ↓
+OllamaEmbeddingGenerator (nomic-embed-text, 768d)
+   └── Concurrent (8 parallel requests)
+        ↓
+QdrantVectorStore
+   └── Upserts: vector + content + metadata (source, chunkIndex)
+```
 
 ---
 
-## Conversational RAG Flow
+## Multi-Provider Architecture
 
-ConversationId
-+
-Current Question
-↓
-Load Conversation History
-↓
-Build Retrieval Query
-(Previous Questions + Current Question)
-↓
-Qdrant Retrieval
-↓
-Prompt Construction
-(History + Retrieved Context)
-↓
-LLM
-↓
-Store Interaction
-↓
-Streaming Response
+The AI provider is selected at startup via configuration:
 
-Endpoint:
+```
+appsettings.json → Ai:DefaultProvider → "local" | "groq"
+        ↓
+AiServiceCollectionExtensions
+   ├── "Ollama" → OllamaChatCompletionService
+   └── "groq"  → GroqChatCompletionService
+```
 
-POST /ask/conversation/stream
+Both implement `IChatCompletionService` with sync and streaming support.
+
+Embeddings always use Ollama locally (nomic-embed-text).
 
 ---
 
 ## Memory Architecture
 
-Conversation Memory is independent from document retrieval.
+Conversation memory and knowledge retrieval are independent concerns:
 
-Conversation Memory:
+| Type | Storage | Purpose |
+|------|---------|---------|
+| **Conversation Memory** | `InMemoryConversationMemory` (ConcurrentDictionary) | User questions + assistant responses + timestamps |
+| **Knowledge Memory** | Qdrant | Document chunks + embeddings + metadata |
 
-Stores:
-
-- User Questions
-- Assistant Responses
-- Timestamp
-
-Purpose:
-
-Provide conversational continuity.
+The system combines both to generate context-aware responses.
 
 ---
 
-Knowledge Memory:
+## Evaluation Pipeline
 
-Qdrant
-
-Stores:
-
-- Document Chunks
-- Embeddings
-- Metadata
-
-Purpose:
-
-Provide knowledge retrieval.
-
----
-
-The application now combines:
-
-Conversation Memory
-+
-Knowledge Memory
-
-to generate responses.
-
----
-Evaluation Dataset
+```
+Evaluation Dataset (12 questions, JSON)
         ↓
-Evaluation Service
+EvaluationService
         ↓
-ConversationQuestionAnsweringService
+ConversationQuestionAnsweringService (same as production pipeline)
         ↓
-RAG Pipeline
+Results: keyword coverage, source coverage, grounding accuracy, latency
+```
 
 ---
-# Sprint 10
 
-          RagDemo.Cli
-                │
-                ▼
-/conversation/stream
-                │
-                ▼
-ConversationQuestionAnsweringService
-                │
-                ▼
-RAG Pipeline
+## API Endpoints
 
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api-conversation/stream` | POST | Conversational RAG with SSE streaming |
+| `/ask` | POST | Single-turn RAG |
+| `/ask/stream` | POST | Single-turn RAG with streaming |
+| `/retrieve` | POST | Retrieval only |
+| `/generate-embeddings` | POST | Document ingestion |
+| `/evaluation/run` | POST | Automated evaluation |
+| `/health` | GET | Health check |
 
 ---
-# Sprint 11
-                  +-------------------+
-                  |   RagDemo.Cli     |
-                  +---------+---------+
-                            |
-                            v
 
-                  +-------------------+
-                  |   RagDemo.Api     |
-                  +---------+---------+
-                            |
-                            v
+## Key ADRs
 
-         +----------------------------------+
-         | ConversationQuestionAnsweringSvc |
-         +----------------------------------+
-                            |
-           +----------------+----------------+
-           |                                 |
-           v                                 v
-
-   Retrieval Pipeline                 Chat Provider
-
-   Qdrant                              Ollama
-   Chunks                              Groq
-   Embeddings
-
-                            |
-                            v
-
-                         Answer
+- [ADR-001](../adr/ADR-001-dependency-inversion.md) — Dependency inversion
+- [ADR-012](../adr/ADR-012-prompt-separation.md) — Prompt construction separation
+- [ADR-013](../adr/ADR-013-grounded-prompting.md) — Grounded prompting
+- [ADR-020](../adr/ADR-020-qdrant-vector-storage.md) — Qdrant vector storage
+- [ADR-021](../adr/ADR-021-conversational-memory.md) — Conversational memory

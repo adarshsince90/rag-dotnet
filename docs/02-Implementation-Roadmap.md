@@ -1,125 +1,33 @@
+# Implementation Roadmap
 
+Sprint-by-sprint evolution from foundation to a full conversational RAG system.
 
-✅ Sprint 0 - Foundation
+| Sprint | Title | Status | Key Deliverable |
+|--------|-------|--------|----------------|
+| [Sprint 00](sprint/Sprint-00.md) | Foundation | ✅ | Clean Architecture scaffold, core interfaces |
+| [Sprint 01](sprint/Sprint-01.md) | Keyword Retrieval | ✅ | TF-IDF retriever, chunking, `KeywordRetriever` |
+| [Sprint 02](sprint/Sprint-02.md) | Ranking & Diagnostics | ✅ | Top-K, scoring, `RetrievalResultProcessor` |
+| [Sprint 03](sprint/Sprint-03.md) | Embeddings & Semantic Retrieval | ✅ | Ollama embeddings, cosine similarity, `VectorRetrieverInMemory` |
+| [Sprint 04](sprint/Sprint-04.md) | LLM Integration | ✅ | RAG pipeline, grounded prompting, `QuestionAnsweringService` |
+| [Sprint 05A](sprint/Sprint-05A.md) | Chunking Experiments | ✅ | `CharacterChunkingStrategy` (1000/200) |
+| [Sprint 05B](sprint/Sprint-05B.md) | PDF Support | ✅ | PdfPig extraction, `PdfChunkProvider` |
+| [Sprint 06](sprint/Sprint-06.md) | Persistent Vector Storage | ✅ | Qdrant integration, `QdrantVectorStore` |
+| [Sprint 07A](sprint/Sprint-07A.md) | Streaming Responses | ✅ | SSE, `IAsyncEnumerable`, `/ask/stream` |
+| [Sprint 07B](sprint/Sprint-07B.md) | Conversational Memory | ✅ | `InMemoryConversationMemory`, history-aware retrieval |
+| [Sprint 08](sprint/Sprint-08.md) | Evaluation & Testing | ✅ | 12-question benchmark, `EvaluationService` |
+| [Sprint 09A](sprint/Sprint-09A.md) | Production Hardening | ✅ | Refactoring, error handling |
+| [Sprint 10](sprint/Sprint-10.md) | Interactive Console Client | ✅ | `RagDemo.Cli` with streaming |
+| [Sprint 11](sprint/Sprint-11.md) | Multi-Provider AI | ✅ | Groq cloud provider, `GroqChatCompletionService` |
+| [Sprint 12](sprint/Sprint-12.md) | Browser Chat UI | ✅ | Static HTML/CSS/JS chat interface |
 
-✅ Sprint 1 - Retrieval Fundamentals
+## Key Milestones
 
-✅ Sprint 2 - Retrieval Ranking & Diagnostics
+- **Sprint 4**: First end-to-end RAG pipeline working
+- **Sprint 6**: Persistent storage — no more startup re-indexing
+- **Sprint 7B**: Conversational memory — multi-turn interactions
+- **Sprint 11**: Cloud provider — API-based LLM as alternative to local
+- **Sprint 12**: Browser UI — visual chat interface
 
-⏳ Sprint 3 - Embeddings & Semantic Search
+## Future
 
-⬜ Sprint 4 - Open Source LLM Integration
-
-⬜ Sprint 5 - PDF Processing
-
-⬜ Sprint 6 - Vector Store
-
-⬜ Sprint 7 - Conversational Memory
-
-⬜ Sprint 8 - Evaluation Framework
-
-⬜ Sprint 9 - Production Hardening
-
------------------------------------
-
-✅ Sprint 0 - Foundation
-
-✅ Sprint 1 - Retrieval Fundamentals
-
-✅ Sprint 2 - Ranking & Diagnostics
-
-✅ Sprint 3 - Embeddings & Semantic Retrieval
-
-⏳ Sprint 4 - LLM Integration
-
-⬜ Sprint 5 - PDF Processing
-
-⬜ Sprint 6 - Vector Database
-
-⬜ Sprint 7 - Conversational Memory
-
-⬜ Sprint 8 - Evaluation & Testing
-
-⬜ Sprint 9 - Production Hardening
-
------------------------------------
-
-✅ Sprint 0 - Foundation
-
-✅ Sprint 1 - Keyword Retrieval
-
-✅ Sprint 2 - Ranking & Diagnostics
-
-✅ Sprint 3 - Embeddings & Semantic Retrieval
-
-✅ Sprint 4 - Retrieval Augmented Generation
-
-✅ Sprint 5A - Chunking Improvements & Retrieval Experiments
-
-⬜ Sprint 5B - PDF Support
-
-⬜ Sprint 6 - Hybrid Retrieval
-
-⬜ Sprint 7 - Vector Database
-
-⬜ Sprint 8 - Conversation Memory
-
-⬜ Sprint 9 - Evaluation & Observability
-
-⬜ Sprint 10 - Production Hardening
-
----
-
-Sprint 5A ✅
-Chunking Improvements
-
-Sprint 5B ✅
-PDF Support
-
-Sprint 6 
-Persistent Vector Storage (Qdrant)
-
-Sprint 7
-Conversation Memory (Assignment Requirement)
-
-Sprint 7B (Optional)
-Provider Abstraction (Ollama/Groq)
-
-Sprint 8
-Evaluation (RAGAS + 10 Question Suite)
-
-Sprint 9
-UI integration
-
-Sprint 10
-Production Hardening
-
------------------------------------
-
-✅ Sprint 0 - Foundation
-
-✅ Sprint 1 - Retrieval Fundamentals
-
-✅ Sprint 2 - Ranking & Diagnostics
-
-✅ Sprint 3 - Embeddings & Semantic Retrieval
-
-✅ Sprint 4 - LLM Integration
-
-✅ Sprint 5 - PDF Processing
-
-✅ Sprint 6 - Persistent Vector Storage (Qdrant)
-
-✅ Sprint 7A - Streaming Responses
-
-✅ Sprint 7B - Conversational Memory
-
-✅ Sprint 8 - Evaluation & Testing
-
-✅ Sprint 9 - Production Hardening - Refactoring
-
-✅ Sprint 10 - Interactive Console Client
-
-✅ Sprint 11 - Introduce multi-provider AI support and integrate Groq.
-
-✅ Sprint 12 - Simple static Browser Chat UI
+See [Future Directions](03-Future-Directions.md) for planned enhancements.

@@ -44,3 +44,10 @@ Explicit grounding instructions reduced hallucinations.
 
 Retrieval completes quickly while generation remains
 the most expensive operation.
+---
+
+## Related
+
+- **Evaluation**: [Evaluation Framework](../../data/evaluation/README.md)
+- **Previous Sprint**: [Sprint 07B — Conversational Memory](Sprint-07B.md)
+- **Next Sprint**: [Sprint 09A — Production Hardening](Sprint-09A.md)

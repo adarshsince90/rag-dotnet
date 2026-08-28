@@ -50,3 +50,8 @@ UI consumes existing API endpoints without introducing new backend services.
 ## Outcome
 
 Users can now interact with the RAG assistant directly from a browser without using Swagger, Scalar, curl, or the CLI client.
+---
+
+## Related
+
+- **Previous Sprint**: [Sprint 11 — Multi-Provider AI](Sprint-11.md)

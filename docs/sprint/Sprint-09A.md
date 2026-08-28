@@ -11,3 +11,9 @@ Enhance evaluation and query classification features
 - Adjusted evaluation summary to include new metrics for faithfulness, answer correctness, context recall, and context precision.
 - Updated appsettings to modify MinimumSimilarity threshold for retrieval.
 - Implemented CORS policy to allow requests from the web UI.
+---
+
+## Related
+
+- **Previous Sprint**: [Sprint 08 — Evaluation](Sprint-08.md)
+- **Next Sprint**: [Sprint 10 — Console Client](Sprint-10.md)
