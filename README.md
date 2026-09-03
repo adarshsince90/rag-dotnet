@@ -72,8 +72,8 @@ curl -X POST http://localhost:5000/generate-embeddings
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api-conversation/stream` | POST | Conversational RAG with streaming from API |
 | `/conversation/stream` | POST | Conversational RAG with streaming (recommended) |
+| `/api-conversation/stream` | POST | Conversational RAG with streaming from API |
 | `/ask` | POST | Single-turn question answering |
 | `/ask/stream` | POST | Single-turn with streaming |
 | `/retrieve` | POST | Retrieval only (no generation) |
