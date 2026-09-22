@@ -136,8 +136,8 @@ Commands: `/new` (new conversation), `/exit` (quit).
 
 ## Documentation
 
-Full documentation is available in the [docs/](docs/README.md) directory:
-
+- 🚀 **[Interactive Documentation & Architecture Portal](docs/index.html)** — Interactive pipeline simulator, 16 master assessment guides, ADR vault, and flashcard trainer
+- [Full Documentation Index](docs/README.md) — Documentation index and reading order
 - [Architecture](docs/architecture/Architecture.md) — System design and component overview
 - [ADRs](docs/adr/README.md) — Architecture Decision Records
 - [Sprint History](docs/sprint/) — 13 sprints documenting the build journey

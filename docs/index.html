@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversational RAG in .NET 10 | Interactive Architecture Portal & Assessment Hub</title>
+  <meta name="description" content="Comprehensive interactive documentation, architecture walkthrough, pipeline simulator, and 16 assessment prep guides for a production-grade Conversational RAG system built from first principles in .NET 10.">
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Portal Styles -->
+  <link rel="stylesheet" href="portal/style.css">
+
+  <!-- Mermaid.js for Dynamic Technical Diagrams -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+
+  <!-- ========================================================================
+       Global Top Navigation Bar
+       ======================================================================== -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-logo">⚡</div>
+      <div class="brand-text">
+        <h1>RAG .NET 10 <span class="badge">Production Hub</span></h1>
+        <div class="brand-sub">Conversational AI Architecture &amp; Assessment Walkthrough</div>
+      </div>
+    </div>
+
+    <!-- Macro Section Navigation -->
+    <nav class="top-nav" aria-label="Main Navigation">
+      <button class="nav-tab-btn active" data-tab="overview" id="navBtnOverview">
+        <span>🏛️</span> Overview
+      </button>
+      <button class="nav-tab-btn" data-tab="pipelines" id="navBtnPipelines">
+        <span>🔄</span> Flows &amp; Pipelines
+      </button>
+      <button class="nav-tab-btn" data-tab="guides" id="navBtnGuides">
+        <span>📚</span> 16 Master Guides
+      </button>
+      <button class="nav-tab-btn" data-tab="sprints" id="navBtnSprints">
+        <span>⏱️</span> Sprints (00-12)
+      </button>
+      <button class="nav-tab-btn" data-tab="adrs" id="navBtnAdrs">
+        <span>🧠</span> ADR Vault
+      </button>
+      <button class="nav-tab-btn" data-tab="trainer" id="navBtnTrainer">
+        <span>🎯</span> Mock Trainer
+      </button>
+      <button class="nav-tab-btn" data-tab="playgrounds" id="navBtnPlaygrounds">
+        <span>🧪</span> Playgrounds
+      </button>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <button class="search-trigger" id="globalSearchTrigger" title="Quick Search">
+        <span>🔍 Search docs...</span>
+        <kbd>Ctrl+K</kbd>
+      </button>
+      <button class="icon-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+        🌙
+      </button>
+      <a href="https://github.com" target="_blank" rel="noopener" class="icon-btn" title="View Source Repository">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       Main Content Container (Tab Panes)
+       ======================================================================== -->
+  <main class="app-container">
+
+    <!-- TAB 1: EXECUTIVE & ARCHITECTURE OVERVIEW -->
+    <section class="tab-pane active" id="tab-overview">
+      <div class="overview-page">
+        <!-- Hero Pitch Banner -->
+        <div class="hero-banner">
+          <h2>Conversational RAG System Built from First Principles</h2>
+          <p>
+            An enterprise-grade, transparent Retrieval-Augmented Generation (RAG) platform developed in <strong>.NET 10</strong>. Designed without high-level framework lock-in, enforcing Clean Architecture, strict grounding boundaries, local Ollama execution with Groq cloud acceleration, and Qdrant vector retrieval.
+          </p>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Core Runtime</div>
+              <div class="stat-value">.NET 10</div>
+              <div class="stat-desc">C# 13 Minimal APIs + Native AOT Ready</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Vector Storage</div>
+              <div class="stat-value">Qdrant</div>
+              <div class="stat-desc">Cosine Similarity • Persistent Disk Storage</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Local Embeddings</div>
+              <div class="stat-value">768 Dim</div>
+              <div class="stat-desc">nomic-embed-text via Ollama (8x Concurrency)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">LLM Orchestration</div>
+              <div class="stat-value">Hybrid</div>
+              <div class="stat-desc">Ollama Gemma 2 (Local) + Groq Llama 3.3 (Cloud)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Evaluation Fidelity</div>
+              <div class="stat-value">100%</div>
+              <div class="stat-desc">10 Core Queries + 2 Hallucination Refusal Probes</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-grid">
+          <!-- Clean Architecture Matrix Card -->
+          <div class="card">
+            <h3>🏛️ Clean Architecture Layers &amp; Boundaries</h3>
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">
+              Strict Dependency Inversion ensures core business domain models remain independent of AI models and vector databases.
+            </p>
+            <div class="arch-layers-matrix">
+              <!-- Domain -->
+              <div class="arch-layer-card active">
+                <div class="arch-layer-top">
+                  <span class="arch-layer-name">RagDemo.Domain</span>
+                  <span class="arch-layer-tag tag-domain">Core Enterprise</span>
+                </div>
+                <div class="arch-layer-desc">Contracts, entities, evaluation records, and retrieval domain models.</div>
+                <div class="arch-detail-box">
+                  <strong>Key Interfaces:</strong> <code>IChatCompletionService</code>, <code>IVectorStore</code>, <code>IRetriever</code>, <code>IEmbeddingGenerator</code>, <code>IConversationMemory</code><br>
+                  <strong>Rule:</strong> Zero external dependencies. Cannot reference Application, Infrastructure, or Api.
+                </div>
+              </div>
+
+              <!-- Application -->
+              <div class="arch-layer-card">
+                <div class="arch-layer-top">
+                  <span class="arch-layer-name">RagDemo.Application</span>
+                  <span class="arch-layer-tag tag-app">Use Cases &amp; Prompts</span>
+                </div>
+                <div class="arch-layer-desc">Pipeline coordination, QueryClassifier, RagPromptBuilder, and evaluation test runner.</div>
+                <div class="arch-detail-box">
+                  <strong>Responsibility:</strong> Orchestrates ingestion and query pipelines. Implements grounding barrier.<br>
+                  <strong>Dependencies:</strong> References only <code>RagDemo.Domain</code>.
+                </div>
+              </div>
+
+              <!-- Infrastructure -->
+              <div class="arch-layer-card">
+                <div class="arch-layer-top">
+                  <span class="arch-layer-name">RagDemo.Infrastructure</span>
+                  <span class="arch-layer-tag tag-infra">Adapters &amp; I/O</span>
+                </div>
+                <div class="arch-layer-desc">Ollama, Groq API, Qdrant client, PdfPig extractor, CharacterChunkingStrategy.</div>
+                <div class="arch-detail-box">
+                  <strong>Responsibility:</strong> Concrete I/O adapters. Network calls, vector indexing, disk persistence.<br>
+                  <strong>Dependencies:</strong> References <code>RagDemo.Domain</code>.
+                </div>
+              </div>
+
+              <!-- API & CLI -->
+              <div class="arch-layer-card">
+                <div class="arch-layer-top">
+                  <span class="arch-layer-name">RagDemo.Api &amp; Cli</span>
+                  <span class="arch-layer-tag tag-api">Entry Points</span>
+                </div>
+                <div class="arch-layer-desc">ASP.NET Core Minimal APIs, SSE streaming endpoints, interactive CLI terminal.</div>
+                <div class="arch-detail-box">
+                  <strong>Responsibility:</strong> Dependency Injection root, HTTP endpoints (<code>/chat/stream</code>, <code>/evaluation/run</code>), SSE serialization.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Key Pillars & Hallmarks -->
+          <div class="card">
+            <h3>⚡ Core System Hallmarks</h3>
+            <ul style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-left:18px;">
+              <li><strong>Zero Framework Lock-in:</strong> Built from fundamentals in C# without LangChain or Semantic Kernel abstractions, providing 100% control over retrieval dynamics.</li>
+              <li><strong>1000 / 200 Character Chunking:</strong> Validated against deep learning papers (629 chunks across Attention Is All You Need and BERT) for optimal recall without token fragmenting.</li>
+              <li><strong>Strict Grounding Contract:</strong> Prompt engineering strictly constrains the LLM to output: <code>"I could not find the answer in the provided documents."</code> when context is insufficient.</li>
+              <li><strong>4-Turn Sliding Conversational Memory:</strong> Thread-safe in-memory cache retaining recent dialogue history to rewrite ambiguous follow-up questions.</li>
+              <li><strong>Real-Time SSE Token Streaming:</strong> <code>IAsyncEnumerable&lt;string&gt;</code> pipeline streaming tokens directly to web and CLI clients with sub-100ms time-to-first-token.</li>
+            </ul>
+            <div style="margin-top:20px;padding:14px;background:rgba(56,189,248,0.08);border-radius:var(--radius-sm);border:1px solid rgba(56,189,248,0.2);">
+              <div style="font-size:12px;font-weight:700;color:var(--accent-cyan);margin-bottom:4px;">💡 Recommended Next Steps:</div>
+              <div style="font-size:12px;color:var(--text-secondary);">
+                Explore the <strong>Flows &amp; Pipelines</strong> tab to step through the live simulator, or dive into the <strong>16 Master Guides</strong> for the full assessment curriculum.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: INTERACTIVE PIPELINE SIMULATOR & FLOWS -->
+    <section class="tab-pane" id="tab-pipelines">
+      <div class="pipeline-page">
+        <div class="pipeline-track-container">
+          <div class="track-controls">
+            <div class="pipeline-mode-selector">
+              <button class="mode-btn active" id="modeQueryBtn">Query &amp; Generation Pipeline</button>
+              <button class="mode-btn" id="modeIngestionBtn">Document Ingestion Pipeline</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="font-size:12px;color:var(--text-muted);">Inference Engine:</div>
+              <div class="pipeline-mode-selector">
+                <button class="mode-btn active" id="simProviderOllama">Ollama (Local)</button>
+                <button class="mode-btn" id="simProviderGroq">Groq (Cloud)</button>
+              </div>
+            </div>
+            <div class="step-controls">
+              <button class="page-btn" id="simStepPrevBtn">◀ Step Back</button>
+              <button class="page-btn" id="simStepNextBtn">Next Step ▶</button>
+              <button class="page-btn" id="simStepResetBtn">↺ Reset</button>
+            </div>
+          </div>
+
+          <!-- Interactive Node Flow Track -->
+          <div class="pipeline-nodes-track" id="pipelineNodesTrack">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Simulator Inspector -->
+        <div class="simulator-inspector">
+          <div class="inspector-pane">
+            <h4>
+              <span>Step Description &amp; Architectural Role</span>
+              <span class="badge" style="background:rgba(52,211,153,0.15);color:var(--accent-emerald);">Active Step</span>
+            </h4>
+            <p id="simStepDesc" style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px;">
+              Selecting step...
+            </p>
+            <div style="font-size:12px;color:var(--text-muted);border-top:1px solid var(--border-subtle);padding-top:12px;">
+              💡 <em>Click any node on the track above or use Step Forward to advance through each transformation.</em>
+            </div>
+          </div>
+
+          <div class="inspector-pane">
+            <h4>
+              <span>Data Payload &amp; Diagnostics</span>
+              <span class="badge" style="background:rgba(56,189,248,0.15);color:var(--accent-cyan);">JSON Representation</span>
+            </h4>
+            <pre class="payload-preview" id="simPayloadPreview">{}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: 16 MASTER GUIDES (DUAL NAVIGATION READER) -->
+    <section class="tab-pane" id="tab-guides">
+      <div class="guides-layout">
+        <!-- Mobile Sidebar Backdrop Overlay -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+        <!-- Collapsible Categorized Sidebar -->
+        <aside class="guides-sidebar" id="guidesSidebar">
+          <div class="sidebar-header">
+            <h2>📚 Master Guides</h2>
+            <span style="font-size:11px;color:var(--accent-cyan);font-weight:700;">16 Topics</span>
+          </div>
+          <div class="sidebar-search-box">
+            <input type="text" class="sidebar-search-input" id="sidebarSearchInput" placeholder="Filter guides by keyword or tag...">
+          </div>
+          <nav class="sidebar-nav-list" id="sidebarGuidesList" aria-label="Guides Directory">
+            <!-- Populated via JS -->
+          </nav>
+          <!-- Collapse Button -->
+          <button class="sidebar-toggle-btn" id="toggleSidebarBtn" title="Toggle Sidebar Width">◀</button>
+        </aside>
+
+        <!-- Main Guide Content Area -->
+        <div class="guides-content-area">
+          <div class="reader-container" id="readerContainer">
+            <div class="guide-header-meta">
+              <div class="guide-breadcrumbs" id="guideBreadcrumb">Phase 1: Foundations &amp; Flow</div>
+              <h2 class="guide-title" id="guideTitle">Loading Guide...</h2>
+              <div class="meta-pills" id="guideMetaPills"></div>
+            </div>
+
+            <!-- Markdown Output Body -->
+            <article class="reader-body" id="readerBody"></article>
+
+            <!-- Guide Pagination Footer -->
+            <div class="guide-pagination">
+              <button class="page-btn" id="prevGuideBtn">◀ Previous Guide</button>
+              <button class="page-btn" id="nextGuideBtn">Next Guide ▶</button>
+            </div>
+          </div>
+
+          <!-- Sticky In-Page Outline -->
+          <nav class="inpage-toc" id="inpageToc" aria-label="Table of Contents">
+            <h4>In This Guide</h4>
+          </nav>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: SPRINT IMPLEMENTATION TIMELINE -->
+    <section class="tab-pane" id="tab-sprints">
+      <div class="vault-page">
+        <div class="hero-banner" style="margin-bottom:24px;">
+          <h2>13-Sprint Evolutionary Implementation Journey</h2>
+          <p>
+            Review the step-by-step engineering progression from Sprint 00 through Sprint 12. Each sprint isolated specific capabilities (chunking, Ollama integration, vector stores, prompt grounding, memory, SSE streaming) before moving to subsequent layers.
+          </p>
+        </div>
+        <div class="cards-grid" id="sprintsGrid">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: ADR DECISION VAULT -->
+    <section class="tab-pane" id="tab-adrs">
+      <div class="vault-page">
+        <div class="hero-banner" style="margin-bottom:24px;">
+          <h2>Architecture Decision Records (ADRs)</h2>
+          <p>
+            Transparent rationale for all architectural design decisions: why character chunking was selected over semantic chunking (ADR-017), why Qdrant was selected over Pinecone (ADR-020), and how prompt separation guarantees grounding (ADR-013).
+          </p>
+        </div>
+        <div class="cards-grid" id="adrsGrid">
+          <!-- Populated via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: MOCK ASSESSMENT TRAINER -->
+    <section class="tab-pane" id="tab-trainer">
+      <div class="trainer-page">
+        <div class="trainer-header">
+          <h2>🎯 Technical Interview &amp; Assessment Trainer</h2>
+          <p style="font-size:14px;color:var(--text-secondary);">
+            Interactive flashcards built directly from <code>14-Mock-Assessment-Questions-And-Answers.md</code>. Click any card to flip between Question and Model Answer.
+          </p>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="category-filter-bar" id="trainerCategoryFilters"></div>
+
+        <!-- Progress Bar -->
+        <div class="trainer-progress-bar">
+          <div class="progress-fill" id="trainerProgressBar"></div>
+        </div>
+
+        <!-- 3D Flip Flashcard -->
+        <div class="flashcard-stage" id="flashcardStage">
+          <div class="flashcard-inner" id="flashcardInner">
+            <!-- Front (Question) -->
+            <div class="flashcard-front">
+              <div class="card-topic-tag" id="cardTopicTag">Topic</div>
+              <div class="card-question" id="cardQuestion">Question Loading...</div>
+              <div class="card-click-hint">
+                <span>🔄 Click anywhere on card to reveal model answer</span>
+                <span id="cardCounter">1 of 24</span>
+              </div>
+            </div>
+
+            <!-- Back (Answer) -->
+            <div class="flashcard-back">
+              <div class="card-topic-tag" style="color:var(--accent-emerald);">Model Answer</div>
+              <div class="card-answer" id="cardAnswer">Answer Loading...</div>
+              <div class="card-click-hint">
+                <span>🔄 Click anywhere to flip back to question</span>
+                <span style="color:var(--accent-emerald);">✓ Verified Model Answer</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flashcard Controls -->
+        <div class="card-controls">
+          <button class="page-btn" id="prevCardBtn">◀ Prev Card</button>
+          <div style="display:flex;gap:10px;">
+            <button class="page-btn" id="reviewCardBtn" style="border-color:var(--accent-amber);color:var(--accent-amber);">
+              🟡 Needs Review
+            </button>
+            <button class="page-btn" id="masterCardBtn" style="border-color:var(--accent-emerald);color:var(--accent-emerald);">
+              🟢 Mastered
+            </button>
+          </div>
+          <button class="page-btn" id="nextCardBtn">Next Card ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 7: RAG INTUITION PLAYGROUNDS -->
+    <section class="tab-pane" id="tab-playgrounds">
+      <div class="playgrounds-page">
+        <!-- Chunking Inspector Widget -->
+        <div class="playground-widget">
+          <h3>✂️ Interactive Chunking &amp; Overlap Inspector</h3>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">
+            Demonstrates <code>CharacterChunkingStrategy</code>. Move the sliders to observe how chunk boundaries and sliding overlap windows protect context continuity.
+          </p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>Chunk Size (Characters)</span>
+                <span id="chunkSizeVal" style="color:var(--accent-cyan);font-family:var(--font-mono);">1000 chars</span>
+              </div>
+              <input type="range" class="slider-input" id="chunkSizeSlider" min="200" max="1500" step="50" value="1000">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>Overlap Window</span>
+                <span id="chunkOverlapVal" style="color:var(--accent-amber);font-family:var(--font-mono);">200 chars</span>
+              </div>
+              <input type="range" class="slider-input" id="chunkOverlapSlider" min="0" max="400" step="25" value="200">
+            </div>
+          </div>
+
+          <div id="chunkStats" style="font-size:12px;color:var(--accent-cyan);margin-top:12px;font-weight:600;"></div>
+          <div class="chunks-visual-display" id="chunkingDisplay"></div>
+        </div>
+
+        <!-- Conversational Memory Sliding Window Widget -->
+        <div class="playground-widget">
+          <h3>🧠 4-Turn Sliding Memory &amp; FIFO Eviction Visualizer</h3>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">
+            Simulates <code>InMemoryConversationMemory</code>. The memory maintains a rolling window of the last 4 turns. Adding a 5th turn triggers FIFO eviction of the oldest turn while enriching the retrieval query vector.
+          </p>
+          <div style="display:flex;gap:12px;margin-bottom:16px;">
+            <button class="page-btn" id="addMemoryTurnBtn">+ Add Simulated Turn</button>
+            <button class="page-btn" id="clearMemoryBtn">Reset Memory</button>
+          </div>
+          <div id="memoryEvictionAlert" style="display:none;padding:8px 12px;background:rgba(251,191,36,0.15);border:1px solid var(--accent-amber);color:var(--accent-amber);border-radius:var(--radius-sm);font-size:12px;margin-bottom:12px;"></div>
+          <div class="chunks-visual-display" id="memoryTurnsContainer"></div>
+          <div style="margin-top:16px;padding:12px;background:var(--code-bg);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);font-size:12px;">
+            <strong style="color:var(--accent-cyan);">Diagnostic:</strong> <span id="enrichedQueryDisplay"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       Global Search Modal (Ctrl+K)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="searchModalBackdrop">
+    <div class="search-modal">
+      <div class="search-box-inner">
+        <span>🔍</span>
+        <input type="text" class="search-input-field" id="searchInputField" placeholder="Search guides, ADRs, sprints, and concepts...">
+        <button class="icon-btn" id="closeSearchBtn" style="border:none;background:transparent;">✕</button>
+      </div>
+      <div class="search-results-list" id="searchResultsList"></div>
+    </div>
+  </div>
+
+  <!-- Knowledge Data Bundle & Application Scripts -->
+  <script src="portal/data.js"></script>
+  <script src="portal/app.js"></script>
+</body>
+</html>

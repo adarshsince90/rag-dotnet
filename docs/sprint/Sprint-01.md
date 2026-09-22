@@ -104,7 +104,7 @@ Sprint 1 established the foundational retrieval pipeline and validated the proje
 
 ## Related
 
-- **ADRs**: [ADR-006 Document Metadata](../adr/ADR-006-document-metadata.md)
+- **ADRs**: [ADR-002 Keyword Retrieval](../adr/ADR-002-keyword-retrieval-baseline.md), [ADR-003 Chunk Provider](../adr/ADR-003-chunk-provider-abstraction.md), [ADR-006 Document Metadata](../adr/ADR-006-document-metadata.md)
 - **Concepts**: [Retrieval](../concepts/01-Retrieval.md)
 - **Previous Sprint**: [Sprint 00 — Foundation](Sprint-00.md)
 - **Next Sprint**: [Sprint 02 — Ranking & Diagnostics](Sprint-02.md)

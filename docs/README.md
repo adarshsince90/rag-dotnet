@@ -1,5 +1,8 @@
 # RagDemo Documentation
 
+> 🚀 **[Open Interactive Documentation & System Walkthrough Portal](index.html)**
+> Access the comprehensive interactive walkthrough with live pipeline simulator, 16 master assessment guides, ADR decision vault, mock interview flashcard trainer, and intuition playgrounds directly in your browser.
+
 ## Getting Started
 
 - [Local Development Setup](setup/Local-Development.md) — Prerequisites, infrastructure, first run

@@ -7,6 +7,8 @@ This directory contains the Architecture Decision Records (ADRs) for the RagDemo
 | ADR | Title | Status | Sprint |
 |-----|-------|--------|--------|
 | [ADR-001](ADR-001-dependency-inversion.md) | Dependency Inversion | Accepted | 0 |
+| [ADR-002](ADR-002-keyword-retrieval-baseline.md) | Keyword-Based Retrieval Baseline | Superseded by ADR-008 | 1 |
+| [ADR-003](ADR-003-chunk-provider-abstraction.md) | Chunk Provider Abstraction | Accepted | 1 |
 | [ADR-004](ADR-004-retrieval-metadata.md) | Retrieval Metadata Preservation | Accepted | 2 |
 | [ADR-005](ADR-005-topk-retrieval.md) | Top-K Retrieval | Accepted | 2 |
 | [ADR-006](ADR-006-document-metadata.md) | Document Metadata Preservation | Accepted | 1 |
@@ -25,11 +27,12 @@ This directory contains the Architecture Decision Records (ADRs) for the RagDemo
 
 ## Numbering Gaps
 
-ADR numbers 002, 003, 015, 016, and 018 were duplicates of other ADRs created during the iterative development process. Their content has been consolidated:
+ADR numbers 015, 016, and 018 were duplicates created during the iterative development process. Their content has been consolidated:
 
 - ADR-015 → merged into [ADR-012](ADR-012-prompt-separation.md) (Prompt Builder Abstraction)
 - ADR-016 → merged into [ADR-014](ADR-014-startup-embeddings.md) (Startup Embeddings)
 - ADR-018 → merged into [ADR-013](ADR-013-grounded-prompting.md) (Grounded Prompting)
+
 
 ## Format
 

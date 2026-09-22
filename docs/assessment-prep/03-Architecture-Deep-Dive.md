@@ -1069,75 +1069,118 @@ These are practical demonstrations of loose coupling.
 
 # Key Architectural Decisions
 
-## ADR-001
+## ADR-001: Dependency Inversion & Clean Architecture
 
 ```text
-Adopt Clean Architecture
+Application logic depends on abstractions, hiding external dependencies (Ollama, Qdrant, PdfPig) behind interfaces.
 ```
 
 Reason:
 
 ```text
-Separation Of Concerns
+Separation of concerns, testability, and technology independence.
 ```
 
 ---
 
-## ADR-002
+## ADR-002: Keyword Retrieval Baseline
 
 ```text
-Use Qdrant
+Implemented KeywordRetriever as the foundational baseline before introducing vector embeddings.
 ```
 
 Reason:
 
 ```text
-Vector Search
+Validate end-to-end retrieval flow and establish baseline metrics.
 ```
 
 ---
 
-## ADR-003
+## ADR-003: Chunk Provider Abstraction
 
 ```text
-Use Ollama
+Abstracted document ingestion behind IChunkProvider (TextFileChunkProvider).
 ```
 
 Reason:
 
 ```text
-Local Model Hosting
+Decouple document extraction from retrieval and downstream consumers.
 ```
 
 ---
 
-## ADR-004
+## ADR-004: Retrieval Metadata Preservation
 
 ```text
-Use SSE
+Retrievers return score, rank, and chunk index alongside text.
 ```
 
 Reason:
 
 ```text
-Streaming Responses
+Make retrieval explainable, measurable, and debuggable.
 ```
 
 ---
 
-## ADR-005
+## ADR-005: Top-K Retrieval
 
 ```text
-Host Lightweight Browser UI
+Retrievers return ranked collections of K most relevant chunks rather than a single match.
 ```
 
 Reason:
 
 ```text
-Simple Deployment
+Enables grounded prompt synthesis across multiple document sections.
 ```
 
 ---
+
+## ADR-007: Local AI Infrastructure via Ollama
+
+```text
+Ollama host for embedding generation and chat completion.
+```
+
+Reason:
+
+```text
+Local execution, zero API costs, open-source model flexibility.
+```
+
+---
+
+## ADR-020: Persistent Vector Storage via Qdrant
+
+```text
+Replaced startup in-memory embeddings with persistent Qdrant HNSW vector store.
+```
+
+Reason:
+
+```text
+Eliminate 10-minute indexing startup lag and support million-scale vector retrieval.
+```
+
+---
+
+## ADR-021: Conversational Memory
+
+```text
+Introduced IConversationMemory to track multi-turn chat history.
+```
+
+Reason:
+
+```text
+Supports context-aware follow-ups without complex query rewriting.
+```
+
+---
+
 
 # Common Assessment Questions
 

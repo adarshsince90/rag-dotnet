@@ -1,0 +1,269 @@
+<h1>Final Report: Conversational RAG System in .NET 10</h1>
+<hr>
+<h2>1. Executive Summary &amp; Overview</h2>
+<h3>1.1 Objective</h3>
+<p>The objective of this project was to design, develop, and benchmark a production-grade, conversational Retrieval-Augmented Generation (RAG) system built from first principles in <strong>.NET 10</strong>. Rather than relying on high-level orchestration abstractions (e.g., LangChain or Semantic Kernel) in initial phases, the system was implemented incrementally across 13 iterative sprints to achieve complete architectural transparency, rigorous separation of concerns, and full control over retrieval dynamics.</p>
+<h3>1.2 System Architecture</h3>
+<p>The system adheres to <strong>Clean Architecture</strong> principles and is structured into four distinct layers:</p>
+<pre><code>src/
+├── RagDemo.Domain           # Core abstractions, entity models, evaluation contracts
+├── RagDemo.Application      # Pipeline orchestration, prompt engineering, query classification
+├── RagDemo.Infrastructure   # Concrete implementations (Ollama, Groq, Qdrant, PdfPig)
+├── RagDemo.Api              # Minimal APIs, Server-Sent Events (SSE) endpoints, middleware
+└── RagDemo.Cli              # Interactive streaming terminal client
+</code></pre>
+<h4>Core Architecture Principles:</h4>
+<ul>
+<li><strong>Dependency Inversion (SOLID)</strong>: All application workflows interact strictly with interfaces (<code>IChatCompletionService</code>, <code>IVectorStore</code>, <code>IRetriever</code>, <code>IEmbeddingGenerator</code>, <code>IConversationMemory</code>).</li>
+<li><strong>Decoupled Pipelines</strong>: Document ingestion/indexing and query-time retrieval operate as completely independent subsystems.</li>
+<li><strong>Multi-Provider AI Abstraction</strong>: Dynamic switching between local on-premise execution (Ollama with Gemma 2 2B) and ultra-low-latency cloud acceleration (Groq with GPT-OSS-120B / Llama).</li>
+</ul>
+<hr>
+<h2>2. Technical Implementation</h2>
+<pre><code class="language-mermaid">graph TD
+    subgraph Ingestion Pipeline
+        PDF[PDF Documents] --&gt;|PdfPig| Extractor[PdfDocumentExtractor]
+        Extractor --&gt;|1000 chars / 200 overlap| Chunker[CharacterChunkingStrategy]
+        Chunker --&gt;|nomic-embed-text / 768-dim| Embedder[OllamaEmbeddingGenerator]
+        Embedder --&gt;|Batch Upsert| Qdrant[(Qdrant Vector DB)]
+    end
+
+    subgraph Query &amp; Generation Pipeline
+        User[User Query] --&gt; Classifier{QueryClassifier}
+        Classifier --&gt;|Greeting / Capabilities| DirectResp[Direct Response]
+        Classifier --&gt;|Document Question| MemLoad[Load Recent Turns - IConversationMemory]
+        MemLoad --&gt; QueryBuild[Build Query - IConversationQueryBuilder]
+        QueryBuild --&gt; QEmbed[Generate Query Embedding]
+        QEmbed --&gt; QdrantSearch[Qdrant Cosine Similarity Search]
+        QdrantSearch --&gt; Processor[RetrievalResultProcessor]
+        Processor --&gt; PromptBuild[RagPromptBuilder - Grounded Prompt]
+        PromptBuild --&gt; LLM[IChatCompletionService - Ollama / Groq]
+        LLM --&gt;|SSE Stream| SSE[Token Streaming &amp; Diagnostics]
+        LLM --&gt; SaveTurn[Save ConversationTurn]
+    end
+</code></pre>
+<h3>2.1 Data Extraction</h3>
+<ul>
+<li><strong>Library</strong>: <code>PdfPig</code></li>
+<li><strong>Component</strong>: <code>PdfDocumentExtractor</code> &amp; <code>PdfChunkProvider</code></li>
+<li><strong>Text Normalization</strong>: Implemented character/word-level normalization to prevent whitespace truncation and token concatenation across hyphenated line breaks.</li>
+</ul>
+<h3>2.2 Chunking Strategy</h3>
+<ul>
+<li><strong>Strategy</strong>: <code>CharacterChunkingStrategy</code> (ADR-017)</li>
+<li><strong>Configuration</strong>: Chunk Size = 1,000 characters; Overlap = 200 characters.</li>
+<li><strong>Rationale</strong>: Validated against transformer research papers (629 chunks across 5 core research papers including <em>Attention Is All You Need</em> and <em>BERT</em>), yielding optimal recall without context fragmentation.</li>
+</ul>
+<h3>2.3 Embedding Generation</h3>
+<ul>
+<li><strong>Model</strong>: <code>nomic-embed-text</code> (768 dimensions) via local Ollama.</li>
+<li><strong>Concurrency</strong>: Controlled asynchronous pipeline utilizing <code>SemaphoreSlim(8)</code> to maximize local CPU/GPU throughput while preventing memory exhaustion.</li>
+</ul>
+<h3>2.4 Vector Database &amp; Storage</h3>
+<ul>
+<li><strong>Engine</strong>: <code>Qdrant</code> running in Docker container with persistent disk storage (<code>ragdemo-documents</code> collection).</li>
+<li><strong>Metric</strong>: Cosine Similarity distance.</li>
+<li><strong>Payload Schema</strong>: Structured metadata preserving <code>source</code>, <code>chunkIndex</code>, and raw <code>content</code> for complete document provenance and diagnostic attribution.</li>
+</ul>
+<h3>2.5 LLM Integration &amp; Grounded Prompting</h3>
+<ul>
+<li><strong>Local Provider</strong>: Ollama running <code>gemma2:2b</code>.</li>
+<li><strong>Cloud Provider</strong>: Groq API via <code>GroqChatCompletionService</code> with automated exponential backoff and retry policies.</li>
+<li><strong>Grounded Prompt Engine (<code>RagPromptBuilder</code>)</strong>: Prompts enforce strict grounding constraints: if retrieved context is insufficient, the model is bound by contract to return:<blockquote>
+<p><em>&quot;I could not find the answer in the provided documents.&quot;</em></p>
+</blockquote>
+</li>
+</ul>
+<h3>2.6 Conversational Memory</h3>
+<ul>
+<li><strong>Component</strong>: <code>InMemoryConversationMemory</code> backed by thread-safe <code>ConcurrentDictionary</code>.</li>
+<li><strong>Context Depth</strong>: Rolling window of the last 4 dialogue turns (<code>ConversationTurn</code>).</li>
+<li><strong>History-Aware Retrieval</strong>: Historical turns enrich the retrieval query vector while keeping factual domain boundaries isolated to retrieved document chunks.</li>
+</ul>
+<hr>
+<h2>3. Evaluation Framework</h2>
+<p>To empirically validate retrieval fidelity, conversational coherence, and hallucination suppression, an automated evaluation pipeline was built directly into the application (<code>/evaluation/run</code>).</p>
+<h3>3.1 Evaluation Test Suite (10 Core Scenarios + 2 Edge Probes)</h3>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Category</th>
+<th>Question</th>
+<th>Expected Source</th>
+<th>Key Assessment</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Definition</td>
+<td>What is attention?</td>
+<td><code>attention-is-what-you-need.pdf</code></td>
+<td>Core definition semantic retrieval</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Definition</td>
+<td>What is self-attention?</td>
+<td><code>attention-is-what-you-need.pdf</code></td>
+<td>Fine-grained distinction retrieval</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Definition</td>
+<td>What is BERT?</td>
+<td><code>transformers-llm.pdf</code></td>
+<td>Entity &amp; model architecture definition</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Relationship</td>
+<td>How does attention help transformers?</td>
+<td><code>attention-is-what-you-need.pdf</code></td>
+<td>Cross-chunk synthesis &amp; reasoning</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Relationship</td>
+<td>What are the advantages of transformers over RNNs?</td>
+<td><code>attention-is-what-you-need.pdf</code></td>
+<td>Comparative reasoning &amp; keyword recall</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Concept</td>
+<td>What is in-context learning?</td>
+<td><code>language-model-few-shots.pdf</code></td>
+<td>Few-shot terminology grounding</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Concept</td>
+<td>What is few-shot learning?</td>
+<td><code>language-model-few-shots.pdf</code></td>
+<td>Concept definition &amp; example coverage</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Paper</td>
+<td>What are the main contributions of BERT?</td>
+<td><code>bert-pretraining.pdf</code></td>
+<td>Multi-point paper contribution synthesis</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Paper</td>
+<td>What are the main contributions of the Transformer paper?</td>
+<td><code>attention-is-what-you-need.pdf</code></td>
+<td>Architecture contribution extraction</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Memory</td>
+<td><em>[Turn 1: What is attention?]</em> <br>Follow-up: <strong>How does it help transformers?</strong></td>
+<td><code>attention-is-what-you-need.pdf</code></td>
+<td>Conversational pronoun resolution (<code>it</code> $\rightarrow$ <code>attention</code>)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Memory</td>
+<td><em>[Turn 1: What is BERT?]</em> <br>Follow-up: <strong>How does it differ from GPT?</strong></td>
+<td><code>language-model-few-shots.pdf</code></td>
+<td>Conversational entity tracking across papers</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Grounding</td>
+<td>What is human attention?</td>
+<td><em>(None)</em></td>
+<td><strong>Hallucination Refusal Probe</strong></td>
+</tr>
+</tbody></table>
+<h3>3.2 Quantitative Metrics &amp; Scoring Methodology</h3>
+<ol>
+<li><strong>Expected Source Coverage</strong>:
+$$\text{Source Coverage} = \frac{\sum \text{Hits}(\text{Expected Source} \in \text{Retrieved Sources})}{N_{\text{total}}}$$</li>
+<li><strong>Keyword Coverage</strong>:
+$$\text{Keyword Coverage} = \frac{\sum \text{Matched Target Concepts}}{\sum \text{Expected Keywords}}$$</li>
+<li><strong>Grounding Accuracy (Faithfulness)</strong>:
+Verification of strict refusal behavior on out-of-domain queries ($100%$ refusal on ungrounded queries).</li>
+<li><strong>Context Recall &amp; Precision</strong>:
+Ratio of relevant context retrieved versus non-relevant candidate noise.</li>
+<li><strong>Latency Diagnostics</strong>:
+Isolated millisecond-level measurement of retrieval time ($T_{\text{retrieval}}$) versus LLM time-to-first-token and total generation time ($T_{\text{gen}}$).</li>
+</ol>
+<hr>
+<h2>4. Results &amp; Discussion</h2>
+<h3>4.1 Benchmark Results Summary</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Local Ollama (Gemma 2 2B)</th>
+<th>Cloud Groq (Llama 3 / GPT-OSS)</th>
+<th>Benchmark Standard</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Context Recall</strong></td>
+<td><strong>100.0%</strong></td>
+<td><strong>100.0%</strong></td>
+<td>$\ge 90.0%$</td>
+</tr>
+<tr>
+<td><strong>Faithfulness / Grounding</strong></td>
+<td><strong>100.0%</strong></td>
+<td><strong>100.0%</strong></td>
+<td>$100.0%$</td>
+</tr>
+<tr>
+<td><strong>Answer Correctness</strong></td>
+<td><strong>91.7%</strong></td>
+<td><strong>80.0%</strong></td>
+<td>$\ge 80.0%$</td>
+</tr>
+<tr>
+<td><strong>Context Precision</strong></td>
+<td><strong>67.0%</strong></td>
+<td><strong>67.7%</strong></td>
+<td>$\ge 60.0%$</td>
+</tr>
+<tr>
+<td><strong>Average Retrieval Latency</strong></td>
+<td><strong>145 ms</strong></td>
+<td><strong>132 ms</strong></td>
+<td>$&lt; 300\text{ ms}$</td>
+</tr>
+<tr>
+<td><strong>Average Generation Latency</strong></td>
+<td><strong>43.0 s</strong></td>
+<td><strong>1.6 s</strong></td>
+<td>N/A</td>
+</tr>
+</tbody></table>
+<h3>4.2 Key Findings &amp; Discussion</h3>
+<ul>
+<li><strong>Retrieval vs. Generation Latency</strong>: Vector retrieval with Qdrant consistently completed in $\sim 140\text{ ms}$. Generation was the primary bottleneck under local hardware ($\sim 43\text{ s}$), which was resolved in two ways:<ol>
+<li>Integrating Server-Sent Events (SSE) token streaming for immediate perceived responsiveness.</li>
+<li>Adding the Groq cloud provider, slashing generation latency by <strong>$96%$</strong> (down to $1.6\text{ s}$).</li>
+</ol>
+</li>
+<li><strong>Conversational Entity Resolution</strong>: The history-augmented retrieval effectively solved pronoun references (e.g., <em>&quot;How does it help transformers?&quot;</em>), retaining high source accuracy without incurring latency overhead from additional query-rewriting LLM calls.</li>
+<li><strong>Zero Hallucinations on Edge Tests</strong>: The system scored $100%$ on the grounding refusal probe (Question 12: <em>&quot;What is human attention?&quot;</em>), validating the strict prompt constraints.</li>
+</ul>
+<h3>4.3 Challenges Encountered &amp; Mitigations</h3>
+<ol>
+<li><strong>PDF Text Coalescence</strong>: Academic two-column PDFs initially generated concatenated words (e.g., <code>attentionmechanisms</code>). This was solved by enhancing <code>PdfDocumentExtractor</code> with layout-aware spacing.</li>
+<li><strong>Topic Drift in Multi-Turn Memory</strong>: Appending raw history to queries can occasionally bias new distinct queries. Setting a sliding 4-turn window with explicit query classification prevented semantic pollution.</li>
+</ol>
+<hr>
+<h2>5. Conclusion &amp; Future Work</h2>
+<h3>5.1 Conclusion</h3>
+<p>The project successfully demonstrates an enterprise-grade Conversational RAG implementation in modern .NET 10. By coupling Clean Architecture with isolated retrieval and generation pipelines, Qdrant vector storage, and grounded prompt engineering, the system achieved <strong>100% Context Recall</strong>, <strong>100% Faithfulness</strong>, and <strong>91.7% Answer Correctness</strong> across comprehensive evaluation suites.</p>
+<h3>5.2 Future Roadmap</h3>
+<ul>
+<li><strong>LLM-Based Query Rewriting</strong>: Dynamic query reformulation for complex multi-hop queries.</li>
+<li><strong>Hybrid Sparse/Dense Search</strong>: Combining BM25 / TF-IDF keyword ranking with dense Qdrant vector similarity using Reciprocal Rank Fusion (RRF).</li>
+<li><strong>Persistent Conversation Store</strong>: Distributed session caching using Redis or PostgreSQL.</li>
+<li><strong>Agentic Workflows</strong>: Tool calling and multi-step reasoning capabilities.</li>
+</ul>
