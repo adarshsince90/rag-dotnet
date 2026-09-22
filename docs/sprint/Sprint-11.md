@@ -105,5 +105,5 @@ Approximately 26x faster.
 
 ## Related
 
-- **Previous Sprint**: [Sprint 10 — Console Client](Sprint-10.md)
-- **Next Sprint**: [Sprint 12 — Browser Chat UI](Sprint-12.md)
+- **Previous Sprint**: [Sprint 10 â€” Console Client](Sprint-10.md)
+- **Next Sprint**: [Sprint 12 â€” Browser Chat UI](Sprint-12.md)

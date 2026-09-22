@@ -314,5 +314,5 @@ Future concepts discovered:
 
 - **ADRs**: [ADR-011 Ollama Chat](../adr/ADR-011-ollama-chat-completion.md), [ADR-012 Prompt Separation](../adr/ADR-012-prompt-separation.md), [ADR-013 Grounded Prompting](../adr/ADR-013-grounded-prompting.md)
 - **Concepts**: [RAG](../concepts/06-RAG.md), [Prompting](../concepts/07-Prompting.md)
-- **Previous Sprint**: [Sprint 03 — Embeddings](Sprint-03.md)
-- **Next Sprint**: [Sprint 05A — Chunking Experiments](Sprint-05A.md)
+- **Previous Sprint**: [Sprint 03 â€” Embeddings](Sprint-03.md)
+- **Next Sprint**: [Sprint 05A â€” Chunking Experiments](Sprint-05A.md)

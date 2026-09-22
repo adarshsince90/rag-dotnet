@@ -89,5 +89,5 @@ Retrieval quality remained acceptable despite this issue.
 ## Related
 
 - **ADRs**: [ADR-019 PDF Support](../adr/ADR-019-pdf-support.md)
-- **Previous Sprint**: [Sprint 05A — Chunking Experiments](Sprint-05A.md)
-- **Next Sprint**: [Sprint 06 — Vector Storage](Sprint-06.md)
+- **Previous Sprint**: [Sprint 05A â€” Chunking Experiments](Sprint-05A.md)
+- **Next Sprint**: [Sprint 06 â€” Vector Storage](Sprint-06.md)

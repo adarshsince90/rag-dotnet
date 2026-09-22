@@ -250,5 +250,5 @@ Semantic retrieval improves meaning-based matching but can sometimes underweight
 
 - **ADRs**: [ADR-007 Ollama](../adr/ADR-007-ollama-local-ai.md), [ADR-008 Semantic Retrieval](../adr/ADR-008-semantic-retrieval.md), [ADR-009 In-Memory Embeddings](../adr/ADR-009-inmemory-embeddings.md)
 - **Concepts**: [Embeddings](../concepts/03-Embeddings.md), [Vectors](../concepts/04-Vectors.md), [Cosine Similarity](../concepts/05-CosineSimilarity.md)
-- **Previous Sprint**: [Sprint 02 — Ranking & Diagnostics](Sprint-02.md)
-- **Next Sprint**: [Sprint 04 — LLM Integration](Sprint-04.md)
+- **Previous Sprint**: [Sprint 02 â€” Ranking & Diagnostics](Sprint-02.md)
+- **Next Sprint**: [Sprint 04 â€” LLM Integration](Sprint-04.md)

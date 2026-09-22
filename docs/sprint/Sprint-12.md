@@ -54,4 +54,4 @@ Users can now interact with the RAG assistant directly from a browser without us
 
 ## Related
 
-- **Previous Sprint**: [Sprint 11 — Multi-Provider AI](Sprint-11.md)
+- **Previous Sprint**: [Sprint 11 â€” Multi-Provider AI](Sprint-11.md)

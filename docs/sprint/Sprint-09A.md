@@ -15,5 +15,5 @@ Enhance evaluation and query classification features
 
 ## Related
 
-- **Previous Sprint**: [Sprint 08 — Evaluation](Sprint-08.md)
-- **Next Sprint**: [Sprint 10 — Console Client](Sprint-10.md)
+- **Previous Sprint**: [Sprint 08 â€” Evaluation](Sprint-08.md)
+- **Next Sprint**: [Sprint 10 â€” Console Client](Sprint-10.md)

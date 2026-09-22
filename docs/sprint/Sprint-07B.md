@@ -141,5 +141,5 @@ Not implemented:
 
 - **ADRs**: [ADR-021 Conversational Memory](../adr/ADR-021-conversational-memory.md)
 - **Concepts**: [Conversational Memory](../concepts/11-Conversational-memory.md)
-- **Previous Sprint**: [Sprint 07A — Streaming](Sprint-07A.md)
-- **Next Sprint**: [Sprint 08 — Evaluation](Sprint-08.md)
+- **Previous Sprint**: [Sprint 07A â€” Streaming](Sprint-07A.md)
+- **Next Sprint**: [Sprint 08 â€” Evaluation](Sprint-08.md)

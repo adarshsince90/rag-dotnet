@@ -351,5 +351,5 @@ Objectives:
 
 - **ADRs**: [ADR-020 Qdrant Vector Storage](../adr/ADR-020-qdrant-vector-storage.md)
 - **Concepts**: [Vector Database](../concepts/09-vector-database.md)
-- **Previous Sprint**: [Sprint 05B — PDF Support](Sprint-05B.md)
-- **Next Sprint**: [Sprint 07A — Streaming](Sprint-07A.md)
+- **Previous Sprint**: [Sprint 05B â€” PDF Support](Sprint-05B.md)
+- **Next Sprint**: [Sprint 07A â€” Streaming](Sprint-07A.md)

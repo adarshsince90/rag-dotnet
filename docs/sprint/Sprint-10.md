@@ -35,5 +35,5 @@ Exit application
 
 ## Related
 
-- **Previous Sprint**: [Sprint 09A — Production Hardening](Sprint-09A.md)
-- **Next Sprint**: [Sprint 11 — Multi-Provider AI](Sprint-11.md)
+- **Previous Sprint**: [Sprint 09A â€” Production Hardening](Sprint-09A.md)
+- **Next Sprint**: [Sprint 11 â€” Multi-Provider AI](Sprint-11.md)

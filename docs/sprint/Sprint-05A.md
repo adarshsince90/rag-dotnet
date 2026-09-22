@@ -108,5 +108,5 @@ not retrieval performance.
 - **ADRs**: [ADR-017 Character Chunking](../adr/ADR-017-character-chunking.md)
 - **Concepts**: [Chunking](../concepts/08-Chunking.md)
 - **Experiments**: [Chunking Lab](../experiments/chunking-lab.md)
-- **Previous Sprint**: [Sprint 04 — LLM Integration](Sprint-04.md)
-- **Next Sprint**: [Sprint 05B — PDF Support](Sprint-05B.md)
+- **Previous Sprint**: [Sprint 04 â€” LLM Integration](Sprint-04.md)
+- **Next Sprint**: [Sprint 05B â€” PDF Support](Sprint-05B.md)
