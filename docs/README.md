@@ -1,6 +1,6 @@
 # RagDemo Documentation
 
-> 🚀 **[Open Interactive Documentation & System Walkthrough Portal](index.html)**
+> 🌐 **[Open Live Interactive Portal](https://adarshsince90.github.io/rag-dotnet/)** *(or open [index.html](index.html) locally in your browser)*
 > Access the comprehensive interactive walkthrough with live pipeline simulator, 16 master assessment guides, ADR decision vault, mock interview flashcard trainer, and intuition playgrounds directly in your browser.
 
 ## Getting Started

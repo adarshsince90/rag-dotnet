@@ -3,6 +3,7 @@
 [![.NET 10](https://img.shields.io/badge/.NET-10.0-512BD4?style=flat&logo=dotnet)](https://dotnet.microsoft.com/)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20Architecture-blue)](docs/architecture/Architecture.md)
 [![Vector DB](https://img.shields.io/badge/Vector%20DB-Qdrant-red)](https://qdrant.tech/)
+[![Live Demo](https://img.shields.io/badge/Live%20Portal-Interactive%20Walkthrough-success?style=flat&logo=githubpages)](https://adarshsince90.github.io/rag-dotnet/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A Conversational Retrieval-Augmented Generation (RAG) chatbot built from first principles in .NET 10, following Clean Architecture.
@@ -136,7 +137,7 @@ Commands: `/new` (new conversation), `/exit` (quit).
 
 ## Documentation
 
-- 🚀 **[Interactive Documentation & Architecture Portal](docs/index.html)** — Interactive pipeline simulator, 16 master assessment guides, ADR vault, and flashcard trainer
+- 🌐 **[Live Interactive Architecture Portal & Walkthrough](https://adarshsince90.github.io/rag-dotnet/)** — Interactive pipeline simulator, 16 master assessment guides, ADR vault, and flashcard trainer (or open [docs/index.html](docs/index.html) locally)
 - [Full Documentation Index](docs/README.md) — Documentation index and reading order
 - [Architecture](docs/architecture/Architecture.md) — System design and component overview
 - [ADRs](docs/adr/README.md) — Architecture Decision Records
