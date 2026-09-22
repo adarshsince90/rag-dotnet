@@ -82,13 +82,13 @@ Retrieval now exposes scoring information to help explain why a chunk was select
 ## Examples
 
 Question:
-Where is Nagarro headquartered?
+Where is Google headquartered?
 
 Expected:
-Germany
+US
 
 Question:
-Where is Nagarro based?
+Where is Google based?
 
 Result:
 May fail because keyword retrieval cannot infer that "based" and "headquarters" are related concepts.
