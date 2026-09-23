@@ -12,7 +12,131 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Portal Styles -->
-  <link rel="stylesheet" href="portal/style.css">
+  <link rel="stylesheet" href="portal/style.css?v=1.2">
+
+  <!-- Guaranteed High-Contrast Light Mode Overrides for Simulator -->
+  <style>
+    [data-theme="light"] .rag-sim-widget {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    }
+    [data-theme="light"] .rag-sim-query-bar {
+      background: #f1f5f9 !important;
+      border-color: #e2e8f0 !important;
+    }
+    [data-theme="light"] .sim-preset-btn {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    }
+    [data-theme="light"] .sim-preset-btn:hover {
+      background: #f0f9ff !important;
+      border-color: #0284c7 !important;
+    }
+    [data-theme="light"] .sim-preset-btn.active {
+      background: #e0f2fe !important;
+      border-color: #0284c7 !important;
+      color: #0369a1 !important;
+    }
+    [data-theme="light"] .sim-preset-tag {
+      background: #e2e8f0 !important;
+      color: #475569 !important;
+    }
+    [data-theme="light"] .sim-query-input {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    [data-theme="light"] .sim-stage-card {
+      background: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    }
+    [data-theme="light"] .sim-stage-card.running {
+      background: #f0f9ff !important;
+      border-color: #0284c7 !important;
+    }
+    [data-theme="light"] .sim-stage-card.completed {
+      border-color: rgba(5, 150, 105, 0.4) !important;
+    }
+    [data-theme="light"] .stage-num {
+      background: #f1f5f9 !important;
+      color: #64748b !important;
+    }
+    [data-theme="light"] .stage-title {
+      color: #0f172a !important;
+    }
+    [data-theme="light"] .stage-status {
+      background: #f1f5f9 !important;
+      color: #64748b !important;
+      border-color: #e2e8f0 !important;
+    }
+    [data-theme="light"] .stage-status.running {
+      background: #e0f2fe !important;
+      color: #0284c7 !important;
+      border-color: #bae6fd !important;
+    }
+    [data-theme="light"] .stage-status.completed {
+      background: #d1fae5 !important;
+      color: #059669 !important;
+      border-color: #a7f3d0 !important;
+    }
+    [data-theme="light"] .sim-stage-body {
+      color: #334155 !important;
+    }
+    [data-theme="light"] .sim-chunk-card {
+      background: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    [data-theme="light"] .sim-chunk-text {
+      color: #334155 !important;
+    }
+    [data-theme="light"] .sim-score-bar-bg {
+      background: #e2e8f0 !important;
+    }
+    [data-theme="light"] .sim-prompt-box {
+      background: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+      color: #334155 !important;
+    }
+    [data-theme="light"] .sim-answer-output {
+      background: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    [data-theme="light"] .sim-hud-item {
+      background: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    [data-theme="light"] .sim-hud-item .metric-label {
+      color: #64748b !important;
+    }
+    [data-theme="light"] .sim-hud-item .metric-val {
+      color: #0284c7 !important;
+    }
+    [data-theme="light"] .rag-sim-callout {
+      background: linear-gradient(135deg, rgba(2, 132, 199, 0.06), rgba(124, 58, 237, 0.06)) !important;
+      border-color: rgba(2, 132, 199, 0.25) !important;
+    }
+    [data-theme="light"] .rag-sim-callout h4 {
+      color: #0f172a !important;
+    }
+    [data-theme="light"] .rag-sim-callout p {
+      color: #475569 !important;
+    }
+    [data-theme="light"] .quickstart-box code {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0284c7 !important;
+    }
+    [data-theme="light"] .sim-toggle-pill.active {
+      background: #ffffff !important;
+      color: #0284c7 !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+    }
+  </style>
 
   <!-- Mermaid.js for Dynamic Technical Diagrams -->
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
@@ -52,7 +176,7 @@
         <span>🎯</span> Mock Trainer
       </button>
       <button class="nav-tab-btn" data-tab="playgrounds" id="navBtnPlaygrounds">
-        <span>🧪</span> Playgrounds
+        <span>⚡</span> Simulator &amp; Playgrounds
       </button>
     </nav>
 
@@ -389,9 +513,125 @@
       </div>
     </section>
 
-    <!-- TAB 7: RAG INTUITION PLAYGROUNDS -->
+    <!-- TAB 7: RAG INTUITION PLAYGROUNDS & SIMULATOR -->
     <section class="tab-pane" id="tab-playgrounds">
       <div class="playgrounds-page">
+        <!-- Interactive RAG Pipeline Simulator (Browser Replay Engine) -->
+        <div class="playground-widget rag-sim-widget">
+          <div class="rag-sim-header">
+            <div>
+              <div class="hero-badge" style="margin-bottom:8px;">Zero Backend Required • Pure Client-Side Replay</div>
+              <h3>🤖 Interactive RAG Pipeline Simulator</h3>
+              <p style="font-size:13px;color:var(--text-secondary);margin-top:4px;">
+                Experience the 5-stage RAG execution pipeline directly in GitHub Pages. Select any benchmark query or test a custom prompt to observe vector similarity retrieval against pre-indexed paper chunks from <em>Attention Is All You Need</em>, strict prompt grounding assembly, and simulated token-by-token streaming.
+              </p>
+            </div>
+            <div class="rag-sim-provider-toggle">
+              <span style="font-size:11px;font-family:var(--font-mono);color:var(--text-muted);display:block;margin-bottom:4px;">Model Engine:</span>
+              <div class="sim-toggle-pill-group">
+                <button class="sim-toggle-pill active" id="simProviderOllamaToggle">Ollama Local (Gemma 2)</button>
+                <button class="sim-toggle-pill" id="simProviderGroqToggle">Groq Cloud (Llama 3.3)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Benchmark Selector Chips -->
+          <div class="rag-sim-query-bar">
+            <div class="rag-sim-presets-title">Select Benchmark Evaluation Scenario:</div>
+            <div class="rag-sim-presets" id="simBenchmarkPresets">
+              <!-- Populated by JS -->
+            </div>
+
+            <!-- Custom Input Box -->
+            <div class="rag-sim-input-row">
+              <input type="text" id="simCustomQueryInput" class="sim-query-input" placeholder="Or enter a custom question to test pipeline grounding...">
+              <button id="simRunPipelineBtn" class="sim-run-btn">
+                <span>▶ Run RAG Pipeline</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 5-Stage Pipeline Stepper Visualizer -->
+          <div class="rag-pipeline-stepper" id="ragPipelineStepper">
+            <!-- Stage 1 -->
+            <div class="sim-stage-card" id="simStageMemory">
+              <div class="sim-stage-header">
+                <div class="stage-left">
+                  <span class="stage-num">Stage 1</span>
+                  <span class="stage-title">🧠 Sliding Memory Context</span>
+                </div>
+                <span class="stage-status" id="simStatusMemory">Pending</span>
+              </div>
+              <div class="sim-stage-body" id="simBodyMemory">Select a query above or click "Run RAG Pipeline" to initiate the pipeline.</div>
+            </div>
+
+            <!-- Stage 2 -->
+            <div class="sim-stage-card" id="simStageRetrieval">
+              <div class="sim-stage-header">
+                <div class="stage-left">
+                  <span class="stage-num">Stage 2</span>
+                  <span class="stage-title">🔍 Vector Retrieval &amp; Cosine Ranking (Qdrant)</span>
+                </div>
+                <span class="stage-status" id="simStatusRetrieval">Pending</span>
+              </div>
+              <div class="sim-stage-body" id="simBodyRetrieval">Qdrant vector collection awaiting query vector (768-dim nomic-embed)...</div>
+            </div>
+
+            <!-- Stage 3 -->
+            <div class="sim-stage-card" id="simStagePrompt">
+              <div class="sim-stage-header">
+                <div class="stage-left">
+                  <span class="stage-num">Stage 3</span>
+                  <span class="stage-title">🛡️ Grounding Prompt Assembly</span>
+                </div>
+                <span class="stage-status" id="simStatusPrompt">Pending</span>
+              </div>
+              <div class="sim-stage-body" id="simBodyPrompt">Prompt boundary awaiting injection of retrieved context and anti-hallucination rules...</div>
+            </div>
+
+            <!-- Stage 4 -->
+            <div class="sim-stage-card" id="simStageStreaming">
+              <div class="sim-stage-header">
+                <div class="stage-left">
+                  <span class="stage-num">Stage 4</span>
+                  <span class="stage-title">⚡ Token Streaming Generation</span>
+                </div>
+                <span class="stage-status" id="simStatusStreaming">Pending</span>
+              </div>
+              <div class="sim-stage-body sim-answer-output" id="simBodyStreaming">Streaming LLM tokens will appear here...</div>
+            </div>
+
+            <!-- Stage 5 -->
+            <div class="sim-stage-card" id="simStageTelemetry">
+              <div class="sim-stage-header">
+                <div class="stage-left">
+                  <span class="stage-num">Stage 5</span>
+                  <span class="stage-title">📊 Turn Telemetry &amp; Evaluation HUD</span>
+                </div>
+                <span class="stage-status" id="simStatusTelemetry">Pending</span>
+              </div>
+              <div class="sim-stage-body" id="simBodyTelemetry">Execution telemetry will calculate upon stream completion.</div>
+            </div>
+          </div>
+
+          <!-- Quickstart Callout for Local Run -->
+          <div class="rag-sim-callout">
+            <div class="callout-icon">⚡</div>
+            <div class="callout-content">
+              <h4>Ready for Live Execution with Your Own Documents &amp; Models?</h4>
+              <p>
+                Run the production .NET 10 API locally to query any uploaded PDF or text file with live Ollama or Groq streaming:
+              </p>
+              <div class="quickstart-box">
+                <code>git clone https://github.com/adarshsince90/rag-dotnet.git &amp;&amp; dotnet run --project src/RagDemo.Api</code>
+                <a href="http://localhost:5000" target="_blank" rel="noopener" class="launch-btn" title="Open Local Studio (if running)">
+                  Open Local Studio (localhost:5000) ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Chunking Inspector Widget -->
         <div class="playground-widget">
           <h3>✂️ Interactive Chunking &amp; Overlap Inspector</h3>

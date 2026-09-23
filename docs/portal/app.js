@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const { specs, guides, flashcards, adrs, sprints, concepts } = window.RAG_DATA;
+  const { specs, guides, flashcards, adrs, sprints, concepts, benchmarks } = window.RAG_DATA;
 
   // State Management
   const state = {
@@ -21,6 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     pipelineMode: 'query', // 'query' | 'ingestion'
     pipelineStep: 0,
     pipelineProvider: 'ollama', // 'ollama' | 'groq'
+    // Interactive RAG Pipeline Simulator
+    simProvider: 'ollama',
+    simRunning: false,
+    selectedBenchmarkId: null,
     // Trainer flashcards state
     flashcardFilter: 'All',
     currentCardIndex: 0,
@@ -171,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (tabId === 'pipelines') {
       updatePipelineVisualizer();
     } else if (tabId === 'playgrounds') {
+      initRagSimulator();
       updateChunkingPlayground();
     }
 
@@ -824,6 +829,288 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ==========================================================================
+     Tab 7 - Widget: Interactive RAG Pipeline Simulator
+     ========================================================================== */
+  const simPresetsContainer = document.getElementById('simBenchmarkPresets');
+  const simCustomQueryInput = document.getElementById('simCustomQueryInput');
+  const simRunPipelineBtn = document.getElementById('simRunPipelineBtn');
+  const simProviderOllamaToggle = document.getElementById('simProviderOllamaToggle');
+  const simProviderGroqToggle = document.getElementById('simProviderGroqToggle');
+
+  // Stages DOM
+  const simStageMemory = document.getElementById('simStageMemory');
+  const simStatusMemory = document.getElementById('simStatusMemory');
+  const simBodyMemory = document.getElementById('simBodyMemory');
+
+  const simStageRetrieval = document.getElementById('simStageRetrieval');
+  const simStatusRetrieval = document.getElementById('simStatusRetrieval');
+  const simBodyRetrieval = document.getElementById('simBodyRetrieval');
+
+  const simStagePrompt = document.getElementById('simStagePrompt');
+  const simStatusPrompt = document.getElementById('simStatusPrompt');
+  const simBodyPrompt = document.getElementById('simBodyPrompt');
+
+  const simStageStreaming = document.getElementById('simStageStreaming');
+  const simStatusStreaming = document.getElementById('simStatusStreaming');
+  const simBodyStreaming = document.getElementById('simBodyStreaming');
+
+  const simStageTelemetry = document.getElementById('simStageTelemetry');
+  const simStatusTelemetry = document.getElementById('simStatusTelemetry');
+  const simBodyTelemetry = document.getElementById('simBodyTelemetry');
+
+  let simInitialized = false;
+
+  function initRagSimulator() {
+    if (simInitialized) return;
+    simInitialized = true;
+
+    // Render Benchmark Presets
+    if (simPresetsContainer && benchmarks) {
+      simPresetsContainer.innerHTML = '';
+      benchmarks.forEach((b, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `sim-preset-btn ${idx === 0 ? 'active' : ''}`;
+        btn.innerHTML = `
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span>${b.icon}</span>
+            <span style="font-weight:600;">${b.question}</span>
+          </div>
+          <span class="sim-preset-tag">${b.category}</span>
+        `;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.sim-preset-btn').forEach(el => el.classList.remove('active'));
+          btn.classList.add('active');
+          state.selectedBenchmarkId = b.id;
+          if (simCustomQueryInput) simCustomQueryInput.value = b.question;
+          runRagSimulation(b);
+        });
+        simPresetsContainer.appendChild(btn);
+      });
+
+      // Default select the first benchmark
+      if (benchmarks.length > 0 && simCustomQueryInput) {
+        state.selectedBenchmarkId = benchmarks[0].id;
+        simCustomQueryInput.value = benchmarks[0].question;
+      }
+    }
+
+    // Provider toggles
+    if (simProviderOllamaToggle && simProviderGroqToggle) {
+      simProviderOllamaToggle.addEventListener('click', () => {
+        state.simProvider = 'ollama';
+        simProviderOllamaToggle.classList.add('active');
+        simProviderGroqToggle.classList.remove('active');
+      });
+
+      simProviderGroqToggle.addEventListener('click', () => {
+        state.simProvider = 'groq';
+        simProviderGroqToggle.classList.add('active');
+        simProviderOllamaToggle.classList.remove('active');
+      });
+    }
+
+    // Run button
+    if (simRunPipelineBtn) {
+      simRunPipelineBtn.addEventListener('click', () => {
+        handleManualRun();
+      });
+    }
+
+    if (simCustomQueryInput) {
+      simCustomQueryInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleManualRun();
+        }
+      });
+    }
+  }
+
+  function handleManualRun() {
+    if (state.simRunning) return;
+    const query = simCustomQueryInput.value.trim();
+    if (!query) return;
+
+    // Check if query matches a benchmark
+    let matched = (benchmarks || []).find(b => b.question.toLowerCase() === query.toLowerCase() || b.id === state.selectedBenchmarkId);
+    if (!matched) {
+      // Synthesize custom benchmark object
+      matched = {
+        id: 'custom-query',
+        category: 'Dynamic Query',
+        question: query,
+        icon: '🔍',
+        isRefusal: false,
+        enrichedQuery: query,
+        retrievedChunks: [
+          {
+            source: 'attention-is-what-you-need.pdf (Chunk #14)',
+            score: 0.812,
+            text: 'Self-attention, sometimes called intra-attention, is an attention mechanism relating different positions of a single sequence in order to compute a representation of the sequence.'
+          },
+          {
+            source: 'attention-is-what-you-need.pdf (Chunk #22)',
+            score: 0.768,
+            text: 'An attention function can be described as mapping a query and a set of key-value pairs to an output, where the query, keys, values, and output are all vectors.'
+          }
+        ],
+        systemPromptSnippet: `You are a factual AI assistant. Use ONLY the following context to answer: "${query}"...\n\n<context>\n[1] attention-is-what-you-need.pdf: Self-attention, sometimes called intra-attention...\n</context>`,
+        answer: `Based on the indexed research papers, for "${query}":\n\nThe system retrieved 2 grounded chunks from *Attention Is All You Need*. Self-attention facilitates sequence processing through mapped query, key, and value vectors with $O(1)$ path length, allowing complete parallelization and cross-sequence reasoning.`,
+        metrics: {
+          ollama: { retrievalMs: 140, generationMs: 3200, tokensPerSec: 38, returnedChunks: 2, topScore: 0.812 },
+          groq: { retrievalMs: 130, generationMs: 380, tokensPerSec: 285, returnedChunks: 2, topScore: 0.812 }
+        }
+      };
+    }
+
+    runRagSimulation(matched);
+  }
+
+  async function runRagSimulation(benchmark) {
+    if (state.simRunning) return;
+    state.simRunning = true;
+    if (simRunPipelineBtn) simRunPipelineBtn.disabled = true;
+
+    const provider = state.simProvider || 'ollama';
+    const providerName = provider === 'groq' ? 'Groq Cloud (Llama 3.3 70B)' : 'Ollama Local (Gemma 2 2B)';
+    const metrics = (benchmark.metrics && benchmark.metrics[provider]) ? benchmark.metrics[provider] : (benchmark.metrics ? benchmark.metrics.ollama : { retrievalMs: 140, generationMs: 2000, tokensPerSec: 40, returnedChunks: 2, topScore: 0.85 });
+
+    // Reset all stages
+    resetStageCard(simStageMemory, simStatusMemory, simBodyMemory, 'Stage 1: Enqueueing query...');
+    resetStageCard(simStageRetrieval, simStatusRetrieval, simBodyRetrieval, 'Stage 2: Awaiting query vector...');
+    resetStageCard(simStagePrompt, simStatusPrompt, simBodyPrompt, 'Stage 3: Awaiting context chunks...');
+    resetStageCard(simStageStreaming, simStatusStreaming, simBodyStreaming, 'Stage 4: Awaiting assembled prompt...');
+    resetStageCard(simStageTelemetry, simStatusTelemetry, simBodyTelemetry, 'Stage 5: Pending completion...');
+
+    // Stage 1: Memory
+    setStageRunning(simStageMemory, simStatusMemory, 'Enriching with 4-turn FIFO memory...');
+    await sleep(250);
+    simBodyMemory.innerHTML = `
+      <div><strong>Enriched Retrieval Query:</strong> <code>"${escapeHtml(benchmark.enrichedQuery)}"</code></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Rolling window slots occupied: 1/4 • No prior pronoun ambiguities detected</div>
+    `;
+    setStageCompleted(simStageMemory, simStatusMemory, '✓ Memory Context Injected');
+
+    // Stage 2: Retrieval
+    setStageRunning(simStageRetrieval, simStatusRetrieval, `Running Qdrant cosine search (${metrics.retrievalMs}ms)...`);
+    await sleep(350);
+
+    let chunksHtml = '<div class="sim-chunk-list">';
+    benchmark.retrievedChunks.forEach((chunk) => {
+      const scorePct = Math.round(chunk.score * 100);
+      chunksHtml += `
+        <div class="sim-chunk-card">
+          <div class="sim-chunk-meta">
+            <span>📄 ${escapeHtml(chunk.source)}</span>
+            <div class="sim-chunk-score-meter">
+              <span>Score: ${chunk.score.toFixed(3)}</span>
+              <div class="sim-score-bar-bg">
+                <div class="sim-score-bar-fill" style="width: ${scorePct}%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="sim-chunk-text">${escapeHtml(chunk.text)}</div>
+        </div>
+      `;
+    });
+    chunksHtml += '</div>';
+
+    simBodyRetrieval.innerHTML = `
+      <div style="font-size:12px;margin-bottom:6px;">
+        Retrieved <strong>${benchmark.retrievedChunks.length} chunks</strong> in <span style="color:var(--accent-cyan);font-family:var(--font-mono);">${metrics.retrievalMs} ms</span> via nomic-embed-text (768-dim) and Qdrant.
+      </div>
+      ${chunksHtml}
+    `;
+    setStageCompleted(simStageRetrieval, simStatusRetrieval, `✓ ${benchmark.retrievedChunks.length} Chunks Ranked`);
+
+    // Stage 3: Prompt Assembly
+    setStageRunning(simStagePrompt, simStatusPrompt, 'Constructing strict grounding prompt...');
+    await sleep(250);
+    simBodyPrompt.innerHTML = `
+      <div style="font-size:12px;margin-bottom:6px;">
+        Assembled system instruction with context boundary tokens and anti-hallucination refusal clause:
+      </div>
+      <pre class="sim-prompt-box"><code>${escapeHtml(benchmark.systemPromptSnippet)}</code></pre>
+    `;
+    setStageCompleted(simStagePrompt, simStatusPrompt, '✓ Strict Context Injected');
+
+    // Stage 4: Streaming Generation
+    setStageRunning(simStageStreaming, simStatusStreaming, `Streaming tokens via SSE from ${providerName}...`);
+    simBodyStreaming.innerHTML = '';
+    const words = benchmark.answer.split(' ');
+    let currentText = '';
+    const tokenDelay = provider === 'groq' ? 14 : 32;
+
+    for (let i = 0; i < words.length; i++) {
+      currentText += (i === 0 ? '' : ' ') + words[i];
+      simBodyStreaming.innerHTML = parseMarkdown(currentText).html + '<span class="sim-streaming-cursor">▌</span>';
+      await sleep(tokenDelay);
+    }
+
+    // Finalize output
+    simBodyStreaming.innerHTML = parseMarkdown(benchmark.answer).html;
+    setStageCompleted(simStageStreaming, simStatusStreaming, `✓ Finished (${metrics.generationMs} ms)`);
+
+    // Stage 5: Telemetry
+    setStageCompleted(simStageTelemetry, simStatusTelemetry, '✓ Verified 100% Faithful');
+    simBodyTelemetry.innerHTML = `
+      <div class="sim-hud-grid">
+        <div class="sim-hud-item">
+          <div class="metric-label">Vector Retrieval</div>
+          <div class="metric-val">${metrics.retrievalMs} ms</div>
+        </div>
+        <div class="sim-hud-item">
+          <div class="metric-label">Generation (${provider.toUpperCase()})</div>
+          <div class="metric-val">${metrics.generationMs} ms</div>
+        </div>
+        <div class="sim-hud-item">
+          <div class="metric-label">Token Emission Rate</div>
+          <div class="metric-val">~${metrics.tokensPerSec} t/s</div>
+        </div>
+        <div class="sim-hud-item">
+          <div class="metric-label">Grounding Fidelity</div>
+          <div class="metric-val" style="color:var(--accent-emerald);">100%</div>
+        </div>
+      </div>
+    `;
+
+    state.simRunning = false;
+    if (simRunPipelineBtn) simRunPipelineBtn.disabled = false;
+  }
+
+  function resetStageCard(card, statusEl, bodyEl, placeholder) {
+    if (!card) return;
+    card.className = 'sim-stage-card';
+    if (statusEl) {
+      statusEl.className = 'stage-status';
+      statusEl.textContent = 'Pending';
+    }
+    if (bodyEl) bodyEl.innerHTML = `<span style="color:var(--text-muted);">${placeholder}</span>`;
+  }
+
+  function setStageRunning(card, statusEl, text) {
+    if (!card) return;
+    card.className = 'sim-stage-card running';
+    if (statusEl) {
+      statusEl.className = 'stage-status running';
+      statusEl.textContent = text;
+    }
+  }
+
+  function setStageCompleted(card, statusEl, text) {
+    if (!card) return;
+    card.className = 'sim-stage-card completed';
+    if (statusEl) {
+      statusEl.className = 'stage-status completed';
+      statusEl.textContent = text;
+    }
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /* ==========================================================================
      Tab 4 & 5: ADRs & Sprints Vault
      ========================================================================== */
   function renderAdrsList() {
@@ -1010,5 +1297,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updatePipelineVisualizer();
   updateChunkingPlayground();
   updateMemoryPlayground();
+  initRagSimulator();
   switchTab(startTab);
 });

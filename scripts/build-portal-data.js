@@ -175,6 +175,114 @@ const systemSpecs = {
   testSuite: "10 Core Scenarios + 2 Grounding Refusal Probes (100% Pass Rate)"
 };
 
+// Benchmark Scenarios for Interactive Browser Simulator
+const benchmarks = [
+  {
+    id: "self-attention",
+    category: "Definition",
+    question: "What is self-attention?",
+    icon: "🔹",
+    isRefusal: false,
+    enrichedQuery: "What is self-attention?",
+    retrievedChunks: [
+      {
+        source: "attention-is-what-you-need.pdf (Chunk #14)",
+        score: 0.884,
+        text: "Self-attention, sometimes called intra-attention, is an attention mechanism relating different positions of a single sequence in order to compute a representation of the sequence. Self-attention has been used successfully in a variety of tasks including reading comprehension, abstractive summarization, textual entailment and learning task-independent sentence representations."
+      },
+      {
+        source: "attention-is-what-you-need.pdf (Chunk #22)",
+        score: 0.812,
+        text: "An attention function can be described as mapping a query and a set of key-value pairs to an output, where the query, keys, values, and output are all vectors. The output is computed as a weighted sum of the values, where the weight assigned to each value is computed by a compatibility function of the query with the corresponding key."
+      },
+      {
+        source: "attention-is-what-you-need.pdf (Chunk #28)",
+        score: 0.745,
+        text: "Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this."
+      }
+    ],
+    systemPromptSnippet: "You are a factual AI assistant. Use ONLY the following context to answer the question. If the answer cannot be found in the context, say 'I cannot answer this question based on the provided documents.' Do not extrapolate or hallucinate.\n\n<context>\n[1] attention-is-what-you-need.pdf: Self-attention, sometimes called intra-attention, is an attention mechanism...\n</context>",
+    answer: "Based on the provided document (*Attention Is All You Need*):\n\n**Self-attention** (also known as *intra-attention*) is an attention mechanism relating different positions of a single sequence to compute a unified representation of that sequence.\n\nKey characteristics from the paper:\n- **Mechanism**: Maps a query and key-value pairs to an output vector, computed as a weighted sum where each weight represents the query-key compatibility score.\n- **Applications**: Successfully utilized in reading comprehension, abstractive summarization, and task-independent sentence representations.\n- **Role in Transformer**: Replaces recurrence and convolution entirely, allowing the model to connect all sequence positions in $O(1)$ operations with full parallelization.",
+    metrics: {
+      ollama: { retrievalMs: 142, generationMs: 3820, tokensPerSec: 38, returnedChunks: 3, topScore: 0.884 },
+      groq: { retrievalMs: 134, generationMs: 410, tokensPerSec: 285, returnedChunks: 3, topScore: 0.884 }
+    }
+  },
+  {
+    id: "transformer-architecture",
+    category: "Architecture",
+    question: "Summarize the Transformer architecture.",
+    icon: "🏛️",
+    isRefusal: false,
+    enrichedQuery: "Summarize the Transformer architecture.",
+    retrievedChunks: [
+      {
+        source: "attention-is-what-you-need.pdf (Chunk #18)",
+        score: 0.892,
+        text: "The Transformer follows this overall architecture using stacked self-attention and point-wise, fully connected layers for both the encoder and decoder. The encoder is composed of a stack of N = 6 identical layers. Each layer has two sub-layers: a multi-head self-attention mechanism and a simple, position-wise fully connected feed-forward network."
+      },
+      {
+        source: "attention-is-what-you-need.pdf (Chunk #19)",
+        score: 0.835,
+        text: "The decoder is also composed of a stack of N = 6 identical layers. In addition to the two sub-layers in each encoder layer, the decoder inserts a third sub-layer, which performs multi-head attention over the output of the encoder stack. We also employ residual connections around each of the sub-layers, followed by layer normalization."
+      }
+    ],
+    systemPromptSnippet: "You are a factual AI assistant. Use ONLY the following context to answer the question...\n\n<context>\n[1] attention-is-what-you-need.pdf: The Transformer follows this overall architecture using stacked self-attention...\n</context>",
+    answer: "Based on *Attention Is All You Need*, the Transformer architecture consists of an **Encoder-Decoder** structure composed of stacked attention and feed-forward layers:\n\n1. **Encoder ($N = 6$ identical layers)**:\n   - **Multi-Head Self-Attention**: Captures pairwise relationships across all sequence positions.\n   - **Position-wise Feed-Forward Network**: Fully connected layer applied separately to each position.\n   - Residual connections and layer normalization (`LayerNorm(x + Sublayer(x))`) wrap each sub-layer.\n\n2. **Decoder ($N = 6$ identical layers)**:\n   - Adds a third sub-layer performing multi-head attention over the encoder's output representations.\n   - Incorporates causal masking in self-attention to prevent positions from attending to future tokens.\n\n3. **Positional Encodings**:\n   - Fixed sinusoidal signals added to input embeddings to inject positional information without recurrence.",
+    metrics: {
+      ollama: { retrievalMs: 148, generationMs: 4100, tokensPerSec: 36, returnedChunks: 2, topScore: 0.892 },
+      groq: { retrievalMs: 138, generationMs: 440, tokensPerSec: 280, returnedChunks: 2, topScore: 0.892 }
+    }
+  },
+  {
+    id: "transformer-vs-rnns",
+    category: "Relationship",
+    question: "What are the advantages of transformers over RNNs?",
+    icon: "⚡",
+    isRefusal: false,
+    enrichedQuery: "What are the advantages of transformers over RNNs?",
+    retrievedChunks: [
+      {
+        source: "attention-is-what-you-need.pdf (Chunk #8)",
+        score: 0.876,
+        text: "Recurrent models typically factor computation along the symbol positions of the input and output sequences. Aligning the positions to steps in computation time, they generate a sequence of hidden states h_t, as a function of the previous hidden state h_{t-1} and the input. This inherently sequential nature precludes parallelization within training examples."
+      },
+      {
+        source: "attention-is-what-you-need.pdf (Chunk #10)",
+        score: 0.854,
+        text: "The Transformer allows for significantly more parallelization and can reach a new state of the art in translation quality after being trained for as little as twelve hours on eight P100 GPUs. Self-attention layers connect all positions with a constant number of sequentially executed operations, whereas recurrent layers require O(n) sequential operations."
+      }
+    ],
+    systemPromptSnippet: "You are a factual AI assistant. Use ONLY the following context to answer the question...\n\n<context>\n[1] attention-is-what-you-need.pdf: Recurrent models typically factor computation along the symbol positions...\n</context>",
+    answer: "Based on the indexed document, the primary advantages of Transformers over RNNs include:\n\n1. **High Parallelization**: RNNs are strictly sequential because computing state $h_t$ requires previous state $h_{t-1}$, preventing parallelization during training. Transformers compute attention over all token positions simultaneously.\n2. **Constant Maximum Path Length**: Self-attention connects any two token positions in $O(1)$ sequential operations, compared to $O(n)$ in recurrent layers. This drastically mitigates the vanishing gradient problem over long-range dependencies.\n3. **Training Speed & Efficiency**: Reaches state-of-the-art translation quality with substantially lower training compute (12 hours on 8 P100 GPUs vs. weeks for recurrent ensembles).",
+    metrics: {
+      ollama: { retrievalMs: 139, generationMs: 3650, tokensPerSec: 39, returnedChunks: 2, topScore: 0.876 },
+      groq: { retrievalMs: 132, generationMs: 390, tokensPerSec: 290, returnedChunks: 2, topScore: 0.876 }
+    }
+  },
+  {
+    id: "refusal-probe",
+    category: "Grounding Probe",
+    question: "Refusal Probe: What is the capital of France?",
+    icon: "🛡️",
+    isRefusal: true,
+    enrichedQuery: "Refusal Probe: What is the capital of France?",
+    retrievedChunks: [
+      {
+        source: "attention-is-what-you-need.pdf (Candidate Chunk)",
+        score: 0.285,
+        text: "[Below Similarity Threshold - No Semantic Relevance]: ...the model achieved 28.4 BLEU on the WMT 2014 English-to-German translation task..."
+      }
+    ],
+    systemPromptSnippet: "You are a factual AI assistant. Use ONLY the following context to answer the question. If the answer cannot be found in the context, say 'I cannot answer this question based on the provided documents.' Do not extrapolate or hallucinate.\n\n<context>\n(No relevant chunks passed the similarity threshold of 0.650)\n</context>",
+    answer: "I cannot answer this question based on the provided documents.\n\nThe indexed corpus exclusively covers transformer neural network architectures, attention mechanisms, and pretraining methodologies (*Attention Is All You Need*, *BERT*, *Few-Shot Learners*). There is no contextual information regarding the capital of France, and ungrounded generation is prohibited by system design.",
+    metrics: {
+      ollama: { retrievalMs: 22, generationMs: 320, tokensPerSec: 42, returnedChunks: 0, topScore: 0.285 },
+      groq: { retrievalMs: 18, generationMs: 95, tokensPerSec: 310, returnedChunks: 0, topScore: 0.285 }
+    }
+  }
+];
+
 // Write output as JavaScript window bundle
 const jsOutput = `// Auto-generated RAG System Knowledge Bundle
 // Generated: ${new Date().toISOString()}
@@ -185,7 +293,8 @@ window.RAG_DATA = {
   flashcards: ${JSON.stringify(flashcards, null, 2)},
   adrs: ${JSON.stringify(adrs, null, 2)},
   sprints: ${JSON.stringify(sprints, null, 2)},
-  concepts: ${JSON.stringify(concepts, null, 2)}
+  concepts: ${JSON.stringify(concepts, null, 2)},
+  benchmarks: ${JSON.stringify(benchmarks, null, 2)}
 };
 `;
 

@@ -1,86 +1,164 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RAG Assistant | .NET 10 Conversational RAG Studio</title>
+  <meta name="description" content="Production-grade Conversational RAG Chat Studio built in .NET 10 with Qdrant vector retrieval, Ollama/Groq hybrid orchestration, and real-time SSE streaming.">
 
-    <title>RAG Assistant</title>
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-    <link href="/css/chat.css" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
+  <!-- Studio Stylesheet -->
+  <link rel="stylesheet" href="/css/chat.css?v=1.1">
 </head>
-
 <body>
 
-    <div class="main-container">
+  <!-- Top Studio Header -->
+  <header class="studio-header">
+    <div class="brand-group">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-info">
+        <div class="brand-title-row">
+          <h1 class="brand-title">RAG Assistant</h1>
+          <span class="badge-runtime">.NET 10</span>
+          <span class="badge-status" id="apiStatusBadge">
+            <span class="status-dot"></span>
+            <span id="apiStatusText">Checking API...</span>
+          </span>
+        </div>
+        <div class="brand-subtitle" id="conversationLabel">
+          Session initializing...
+        </div>
+      </div>
+    </div>
 
-       <div class="header">
+    <!-- Header Actions & External Portal Links -->
+    <div class="header-actions">
+      <a href="https://adarshsince90.github.io/rag-dotnet/" target="_blank" rel="noopener" class="header-nav-link" title="Open Interactive Documentation & Assessment Hub">
+        <span>📚</span> Architecture &amp; Guides Portal
+      </a>
+      <a href="/scalar/v1" target="_blank" rel="noopener" class="header-nav-link" title="Open OpenAPI Scalar Documentation">
+        <span>📡</span> Scalar Specs
+      </a>
+      <button id="new-chat-btn" class="action-btn new-chat-btn" title="Reset Session and Start New Conversation">
+        <span>🔄</span> New Chat
+      </button>
+    </div>
+  </header>
 
-            <div>
-                <h2>🤖 RAG Assistant</h2>
-                <div id="conversation-label" class="conversation-label">
-                </div>
-            </div>
+  <!-- Live Telemetry HUD Shelf -->
+  <section class="telemetry-shelf" aria-label="Real-time Pipeline Telemetry">
+    <div class="hud-card" id="hudRetrievalCard">
+      <div class="hud-label">
+        <span>🔍 Retrieval</span>
+        <span class="hud-pill" id="hudChunksPill">0 Chunks</span>
+      </div>
+      <div class="hud-value" id="hudRetrievalMs">-- <span class="hud-unit">ms</span></div>
+      <div class="hud-sub" id="hudRetrievalDetail">Qdrant Vector Store</div>
+    </div>
 
-            <button
-                id="new-chat-btn"
-                class="btn btn-outline-secondary">
-                New Chat
+    <div class="hud-card" id="hudScoreCard">
+      <div class="hud-label">
+        <span>🎯 Vector Similarity</span>
+        <span class="hud-pill" id="hudScorePill">Cosine</span>
+      </div>
+      <div class="hud-value" id="hudHighestScore">--</div>
+      <div class="hud-meter-wrap">
+        <div class="hud-meter-bar" id="hudScoreBar" style="width: 0%;"></div>
+      </div>
+    </div>
+
+    <div class="hud-card" id="hudGenerationCard">
+      <div class="hud-label">
+        <span>⚡ Generation</span>
+        <span class="hud-pill" id="hudProviderPill">LLM</span>
+      </div>
+      <div class="hud-value" id="hudGenerationMs">-- <span class="hud-unit">ms</span></div>
+      <div class="hud-sub" id="hudGenerationDetail">SSE Stream</div>
+    </div>
+
+    <div class="hud-card" id="hudTotalCard">
+      <div class="hud-label">
+        <span>⏱️ End-to-End Turn</span>
+        <span class="hud-pill" id="hudStatusPill">Idle</span>
+      </div>
+      <div class="hud-value" id="hudTotalMs">-- <span class="hud-unit">ms</span></div>
+      <div class="hud-sub" id="hudTotalDetail">Sliding Memory (4-Turn FIFO)</div>
+    </div>
+  </section>
+
+  <!-- Main Chat Conversation Workspace -->
+  <main class="chat-workspace">
+    <div id="chat-container" class="chat-messages-container">
+
+      <!-- Initial Welcome Experience -->
+      <div class="welcome-hero" id="welcomeHero">
+        <div class="hero-badge">Conversational RAG • Grounded First Principles</div>
+        <h2>Enterprise Knowledge Assistant</h2>
+        <p class="hero-desc">
+          Query the pre-indexed technical corpus (including <em>Attention Is All You Need</em>, <em>BERT Pretraining</em>, and <em>Language Models are Few-Shot Learners</em>). The assistant enforces strict boundary grounding, refusing to hallucinate when context is absent.
+        </p>
+
+        <div class="hero-specs-row">
+          <div class="spec-pill"><span>🏛️</span> Clean Architecture</div>
+          <div class="spec-pill"><span>🔢</span> nomic-embed-text (768 Dim)</div>
+          <div class="spec-pill"><span>📦</span> Qdrant Vector Collection</div>
+          <div class="spec-pill"><span>🧠</span> 4-Turn Rolling Memory</div>
+          <div class="spec-pill"><span>🛡️</span> Zero Hallucination Policy</div>
+        </div>
+
+        <div class="starter-prompts-section">
+          <div class="starter-header">Suggested Assessment &amp; Technical Queries:</div>
+          <div class="starter-grid">
+            <button class="prompt-chip" data-prompt="What is self-attention?">
+              <span class="chip-icon">🔹</span>
+              <span class="chip-text">What is self-attention?</span>
             </button>
-
-        </div>
-
-        <div id="chat-container"
-             class="chat-container">
-
-            <div class="welcome-message">
-
-                <h3>🤖 RAG Assistant</h3>
-
-                <p>
-                    Ask questions about the documents
-                    currently indexed in the knowledge base.
-                </p>
-
-                <div class="example-prompts">
-
-                    <div class="prompt">
-                        What is self-attention?
-                    </div>
-
-                    <div class="prompt">
-                        Summarize the Transformer architecture.
-                    </div>
-
-                    <div class="prompt">
-                        What limitations are discussed?
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="input-panel">
-
-            <input id="question-input"
-                   type="text"
-                   class="form-control"
-                   placeholder="Ask a question..." />
-
-            <button id="send-btn"
-                    class="btn btn-primary">
-                Send
+            <button class="prompt-chip" data-prompt="Summarize the Transformer architecture.">
+              <span class="chip-icon">🏛️</span>
+              <span class="chip-text">Summarize the Transformer architecture.</span>
             </button>
-
+            <button class="prompt-chip" data-prompt="What are the advantages of transformers over RNNs?">
+              <span class="chip-icon">⚡</span>
+              <span class="chip-text">What are advantages of transformers over RNNs?</span>
+            </button>
+            <button class="prompt-chip" data-prompt="Refusal Probe: What is the capital of France?">
+              <span class="chip-icon">🛡️</span>
+              <span class="chip-text">Refusal Probe: What is the capital of France?</span>
+            </button>
+          </div>
         </div>
+      </div>
 
     </div>
-    <script src="/js/chat.js"></script>
+
+    <!-- Floating Input Dock -->
+    <div class="input-dock-container">
+      <div class="input-dock">
+        <textarea
+          id="question-input"
+          class="chat-input"
+          placeholder="Ask a technical question about the indexed research papers..."
+          rows="1"
+          aria-label="Ask a question"></textarea>
+        
+        <button id="send-btn" class="send-action-btn" title="Send Question (Enter)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+      <div class="input-hint">
+        <span>Enter sends • Shift+Enter adds newline • Grounded responses only</span>
+        <span id="charCount"></span>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/chat.js"></script>
 </body>
 </html>

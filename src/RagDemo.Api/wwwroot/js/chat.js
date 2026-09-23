@@ -1,517 +1,551 @@
-console.log("chat.js loaded");
+/**
+ * RAG Assistant .NET 10 Studio - Client Orchestration
+ * Handles SSE streaming, real-time telemetry HUD updates, markdown parsing, and session state.
+ */
 
-let conversationId =
-    localStorage.getItem("conversation-id");
+(() => {
+  // Session State
+  let conversationId = localStorage.getItem("conversation-id");
+  if (!conversationId) {
+    conversationId = crypto.randomUUID();
+    localStorage.setItem("conversation-id", conversationId);
+  }
 
-if (!conversationId) {
+  // Base URL (handles both http://localhost:5000 and direct file:// inspection)
+  const apiBase = (window.location.protocol === "file:") ? "http://localhost:5000" : "";
 
-    conversationId =
-        crypto.randomUUID();
+  // DOM Elements
+  const chatContainer = document.getElementById("chat-container");
+  const questionInput = document.getElementById("question-input");
+  const sendButton = document.getElementById("send-btn");
+  const newChatBtn = document.getElementById("new-chat-btn");
+  const conversationLabel = document.getElementById("conversationLabel");
+  const apiStatusBadge = document.getElementById("apiStatusBadge");
+  const apiStatusText = document.getElementById("apiStatusText");
 
-    localStorage.setItem(
-        "conversation-id",
-        conversationId);
-}
+  // Telemetry HUD Elements
+  const hudRetrievalMs = document.getElementById("hudRetrievalMs");
+  const hudChunksPill = document.getElementById("hudChunksPill");
+  const hudHighestScore = document.getElementById("hudHighestScore");
+  const hudScoreBar = document.getElementById("hudScoreBar");
+  const hudGenerationMs = document.getElementById("hudGenerationMs");
+  const hudTotalMs = document.getElementById("hudTotalMs");
+  const hudStatusPill = document.getElementById("hudStatusPill");
 
-document
-    .getElementById("new-chat-btn")
-    .addEventListener(
-        "click",
-        startNewConversation);
+  // Initialize UI
+  updateConversationLabel();
+  checkApiHealth();
+  setupTextareaAutoResize();
 
-const chatContainer =
-    document.getElementById("chat-container");
+  // Attach Event Listeners
+  if (newChatBtn) {
+    newChatBtn.addEventListener("click", startNewConversation);
+  }
 
-const sendButton =
-    document.getElementById("send-btn");
+  if (sendButton) {
+    sendButton.addEventListener("click", sendMessage);
+  }
 
-const questionInput =
-    document.getElementById("question-input");
-
-sendButton.addEventListener(
-    "click",
-    sendMessage);
-
-questionInput.addEventListener(
-    "keydown",
-    function (event) {
-
-        if (event.key === "Enter") {
-
-            sendMessage();
-        }
+  if (questionInput) {
+    questionInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
     });
 
-async function sendMessage() {
+    questionInput.addEventListener("input", () => {
+      setupTextareaAutoResize();
+    });
+  }
 
-    sendButton.disabled = true;
-    questionInput.disabled = true;
-    
-    const question =
-        questionInput.value.trim();
+  // Delegate starter prompt chip clicks
+  document.addEventListener("click", (e) => {
+    const chip = e.target.closest(".prompt-chip");
+    if (chip && chip.dataset.prompt) {
+      questionInput.value = chip.dataset.prompt;
+      sendMessage();
+    }
+  });
 
-    if (!question) {
-        return;
+  /**
+   * Check API Health status
+   */
+  async function checkApiHealth() {
+    try {
+      const res = await fetch(`${apiBase}/diagnostic/health`);
+      if (res.ok) {
+        apiStatusBadge.className = "badge-status online";
+        apiStatusText.textContent = "API Online (Ollama/Groq)";
+      } else {
+        markApiOffline();
+      }
+    } catch {
+      markApiOffline();
+    }
+  }
+
+  function markApiOffline() {
+    apiStatusBadge.className = "badge-status offline";
+    apiStatusText.textContent = "API Offline (Run dotnet run)";
+  }
+
+  /**
+   * Reset / Start New Conversation
+   */
+  function startNewConversation() {
+    if (!confirm("Start a new conversation session? This resets the 4-turn sliding memory.")) {
+      return;
     }
 
-    questionInput.value = "";
-
-    appendUserMessage(question);
-
-    const assistantElements =
-        createAssistantMessage();
-
-    await streamQuestion(
-        question,
-        assistantElements.answer,
-        assistantElements.sources,
-        assistantElements.diagnostics);
-}
-
-function startNewConversation() {
-
-    if (!confirm(
-        "Start a new conversation?"))
-    {
-        return;
-    }
-
-    conversationId =
-        crypto.randomUUID();
-
-    localStorage.setItem(
-        "conversation-id",
-        conversationId);
-
+    conversationId = crypto.randomUUID();
+    localStorage.setItem("conversation-id", conversationId);
     updateConversationLabel();
 
-    chatContainer.innerHTML =
-        getWelcomeMarkup();
-}
+    // Reset HUD
+    resetTelemetryHud();
 
-function getWelcomeMarkup() {
+    // Reset Chat Messages to Welcome state
+    chatContainer.innerHTML = getWelcomeHeroMarkup();
+    questionInput.value = "";
+    questionInput.focus();
+  }
 
-    return `
-        <div class="welcome-message">
+  function updateConversationLabel() {
+    if (conversationLabel) {
+      conversationLabel.textContent = `Session: ${conversationId.substring(0, 8)}...${conversationId.substring(conversationId.length - 4)} • 4-Turn Window`;
+    }
+  }
 
-            <h4>Welcome</h4>
+  function resetTelemetryHud() {
+    hudRetrievalMs.innerHTML = `-- <span class="hud-unit">ms</span>`;
+    hudChunksPill.textContent = `0 Chunks`;
+    hudHighestScore.textContent = `--`;
+    hudScoreBar.style.width = `0%`;
+    hudGenerationMs.innerHTML = `-- <span class="hud-unit">ms</span>`;
+    hudTotalMs.innerHTML = `-- <span class="hud-unit">ms</span>`;
+    hudStatusPill.textContent = `Idle`;
+  }
 
-            <p>
-                Ask questions about your indexed documents.
-            </p>
+  /**
+   * Send question and consume SSE stream
+   */
+  async function sendMessage() {
+    const question = questionInput.value.trim();
+    if (!question) return;
 
-            <ul>
-                <li>What is self-attention?</li>
-                <li>Summarize the transformer architecture.</li>
-                <li>What limitations are discussed?</li>
-            </ul>
+    // Disable inputs while processing
+    sendButton.disabled = true;
+    questionInput.disabled = true;
+    questionInput.value = "";
+    setupTextareaAutoResize();
 
-        </div>
-    `;
-}
+    // Remove welcome hero if present
+    const hero = document.getElementById("welcomeHero");
+    if (hero) hero.remove();
 
-function updateConversationLabel() {
+    // Append User Message Card
+    appendUserMessage(question);
 
-    const label =
-        document.getElementById(
-            "conversation-label");
+    // Create Assistant Message Card with typing dots
+    const assistantCard = createAssistantCard();
 
-    label.textContent =
-        `Conversation: ${conversationId}`;
-}
+    // Update HUD status to Active
+    hudStatusPill.textContent = "Streaming...";
 
-function appendUserMessage(text) {
-
-    removeWelcomeMessage();
-
-    const wrapper =
-        document.createElement("div");
-
-    wrapper.className =
-        "message";
-
-    wrapper.innerHTML =
-        `
-        <div class="user-card">
-            <strong>You</strong>
-            <div class="mt-2">${escapeHtml(text)}</div>
-        </div>
-        `;
-
-    chatContainer.appendChild(wrapper);
-
-    scrollToBottom();
-}
-
-function createAssistantMessage() {
-
-    removeWelcomeMessage();
-
-    const wrapper =
-        document.createElement("div");
-
-    wrapper.className =
-        "message";
-
-    wrapper.innerHTML =
-`
-<div class="assistant-card">
-
-    <strong>🤖 Assistant</strong>
-
-    <div class="answer mt-2"></div>
-
-    <div class="typing-indicator">
-
-        <span></span>
-        <span></span>
-        <span></span>
-
-    </div>
-
-    <div class="sources"></div>
-
-    <div class="diagnostics"></div>
-
-</div>
-`;
-
-    chatContainer.appendChild(wrapper);
-
-    scrollToBottom();
-
-    return {
-        answer: wrapper.querySelector(".answer"),
-        sources: wrapper.querySelector(".sources"),
-        diagnostics: wrapper.querySelector(".diagnostics")
-    };
-}
-
-async function streamQuestion(
-    question,
-    answerElement,
-    sourcesElement,
-    diagnosticsElement) {
-
-    let retrieval = null;
-    let completion = null;
+    const startTime = performance.now();
 
     try {
+      const response = await fetch(`${apiBase}/conversation/stream`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationId: conversationId,
+          question: question
+        })
+      });
 
-        const response =
-            await fetch(
-                "/conversation/stream",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        conversationId: conversationId,
-                        question: question
-                    })
-                });
-
-        if (!response.ok) {
-
-            answerElement.textContent =
-                "Failed to contact API.";
-
-            return;
+      if (!response.ok) {
+        if (window.location.protocol === "file:") {
+          assistantCard.answerEl.innerHTML = `<span style="color:var(--accent-amber);">⚠️ Opened via file:// protocol. Start the backend with <code>dotnet run --project src/RagDemo.Api</code> and open <a href="http://localhost:5000" target="_blank" style="color:var(--accent-cyan);text-decoration:underline;">http://localhost:5000</a> to interact with the live model.</span>`;
+        } else {
+          assistantCard.answerEl.innerHTML = `<span style="color:var(--accent-rose);">❌ Server returned error: ${response.status} ${response.statusText}</span>`;
         }
+        finishTurn();
+        return;
+      }
 
-        const reader =
-            response.body.getReader();
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let rawAnswerText = "";
+      let retrievalData = null;
+      let completionData = null;
 
-        const decoder =
-            new TextDecoder();
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
 
-        let buffer = "";
+        buffer += decoder.decode(value, { stream: true });
+        const events = buffer.split("\n\n");
+        buffer = events.pop(); // keep remainder
 
-        while (true) {
+        for (const evt of events) {
+          const parsed = parseSseEvent(evt);
+          if (!parsed) continue;
 
-            const { value, done } =
-                await reader.read();
+          switch (parsed.type) {
+            case "token": {
+              let tokenStr = parsed.data;
+              try {
+                tokenStr = JSON.parse(parsed.data);
+              } catch {
+                // Already raw string
+              }
 
-            if (done)
-                break;
+              // Remove initial typing indicator on first token
+              if (assistantCard.typingEl) {
+                assistantCard.typingEl.remove();
+                assistantCard.typingEl = null;
+              }
 
-            buffer += decoder.decode(
-                value,
-                { stream: true });
-
-            const events =
-                buffer.split("\n\n");
-
-            buffer = events.pop();
-
-            for (const evt of events) {
-
-                const parsed =
-                    parseEvent(evt);
-
-                if (!parsed)
-                    continue;
-
-                switch (parsed.type) {
-
-                    case "token":
-
-                        const token =
-                            JSON.parse(parsed.data);
-
-                        appendToken(
-                            answerElement,
-                            token);
-
-                        scrollToBottom();
-                        break;
-
-                    case "retrieval":
-
-                        retrieval =
-                            JSON.parse(parsed.data);
-
-                        break;
-
-                    case "completed":
-
-                        completion =
-                            JSON.parse(parsed.data);
-
-                        const cursor =
-                                answerElement.querySelector(
-                                    ".streaming-cursor");
-
-                            if (cursor) {
-                                cursor.remove();
-                            }
-
-                        const typingIndicator =
-                                answerElement.parentElement
-                                    .querySelector(".typing-indicator");
-
-                            if (typingIndicator) {
-                                typingIndicator.remove();
-                            }
-
-                        renderSources(
-                            sourcesElement,
-                            retrieval);
-
-                        renderDiagnostics(
-                            diagnosticsElement,
-                            retrieval,
-                            completion);
-
-                        questionInput.disabled = false;
-                        sendButton.disabled = false;
-                        questionInput.focus();
-
-                        break;
-                }
+              rawAnswerText += tokenStr;
+              updateStreamingAnswer(assistantCard.answerEl, rawAnswerText);
+              scrollToBottom();
+              break;
             }
+
+            case "retrieval": {
+              try {
+                retrievalData = JSON.parse(parsed.data);
+                updateRetrievalTelemetry(retrievalData);
+                renderSourcesList(assistantCard.sourcesEl, retrievalData);
+              } catch (e) {
+                console.error("Error parsing retrieval event", e);
+              }
+              break;
+            }
+
+            case "completed": {
+              try {
+                completionData = JSON.parse(parsed.data);
+                updateCompletionTelemetry(completionData);
+              } catch (e) {
+                console.error("Error parsing completed event", e);
+              }
+
+              // Remove streaming cursor
+              const cursor = assistantCard.answerEl.querySelector(".streaming-cursor");
+              if (cursor) cursor.remove();
+
+              // Final markdown formatting
+              assistantCard.answerEl.innerHTML = formatMarkdown(rawAnswerText);
+
+              // Render Diagnostics
+              renderDiagnosticsAccordion(assistantCard.diagnosticsEl, retrievalData, completionData);
+              finishTurn();
+              break;
+            }
+          }
         }
+      }
 
+      // Safeguard if completed event was missed
+      if (sendButton.disabled) {
+        const cursor = assistantCard.answerEl.querySelector(".streaming-cursor");
+        if (cursor) cursor.remove();
+        assistantCard.answerEl.innerHTML = formatMarkdown(rawAnswerText);
+        finishTurn();
+      }
+
+    } catch (err) {
+      console.error("Streaming error:", err);
+      if (assistantCard.typingEl) assistantCard.typingEl.remove();
+      assistantCard.answerEl.innerHTML = `<span style="color:var(--accent-rose);">❌ Unable to connect to RAG API. Ensure the .NET server is running at this endpoint.</span>`;
+      finishTurn();
     }
-    catch (error) {
+  }
 
-        console.error(error);
+  function finishTurn() {
+    sendButton.disabled = false;
+    questionInput.disabled = false;
+    questionInput.focus();
+    hudStatusPill.textContent = "Idle";
+    scrollToBottom();
+  }
 
-        answerElement.textContent =
-            "Unable to connect to the server.";
-            
-        questionInput.disabled = false;
-        sendButton.disabled = false;
+  /**
+   * Telemetry Updates
+   */
+  function updateRetrievalTelemetry(retrieval) {
+    if (!retrieval) return;
+    if (retrieval.RetrievalMs !== undefined) {
+      hudRetrievalMs.innerHTML = `${retrieval.RetrievalMs} <span class="hud-unit">ms</span>`;
     }
-}
-
-function appendToken(
-    answerElement,
-    token)
-{
-    const cursor =
-        answerElement.querySelector(
-            ".streaming-cursor");
-
-    if (cursor) {
-        cursor.remove();
+    if (retrieval.ReturnedChunks !== undefined) {
+      hudChunksPill.textContent = `${retrieval.ReturnedChunks} Chunks`;
     }
-
-    answerElement.appendChild(
-        document.createTextNode(token));
-
-    const newCursor =
-        document.createElement("span");
-
-    newCursor.className =
-        "streaming-cursor";
-
-    newCursor.textContent = "▌";
-
-    answerElement.appendChild(
-        newCursor);
-}
-
-function updateStreamingText(
-    answerElement,
-    token) {
-
-    const existingCursor =
-        answerElement.querySelector(
-            ".streaming-cursor");
-
-    if (existingCursor) {
-        existingCursor.remove();
+    if (retrieval.HighestScore !== undefined) {
+      const score = retrieval.HighestScore;
+      hudHighestScore.textContent = score.toFixed(3);
+      hudScoreBar.style.width = `${Math.min(100, Math.round(score * 100))}%`;
     }
+  }
 
-    answerElement.appendChild(
-        document.createTextNode(token));
+  function updateCompletionTelemetry(completion) {
+    if (!completion) return;
+    if (completion.GenerationMs !== undefined) {
+      hudGenerationMs.innerHTML = `${completion.GenerationMs} <span class="hud-unit">ms</span>`;
+    }
+    if (completion.TotalMs !== undefined) {
+      hudTotalMs.innerHTML = `${completion.TotalMs} <span class="hud-unit">ms</span>`;
+    }
+  }
 
-    const cursor =
-        document.createElement("span");
+  /**
+   * UI Rendering Helpers
+   */
+  function appendUserMessage(text) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "message-wrapper user";
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    cursor.className =
-        "streaming-cursor";
+    wrapper.innerHTML = `
+      <div class="user-card">
+        <div class="msg-meta">
+          <span>👤 User Query</span>
+          <span class="msg-timestamp">${now}</span>
+        </div>
+        <div class="msg-body">${escapeHtml(text)}</div>
+      </div>
+    `;
 
-    cursor.textContent = "▌";
+    chatContainer.appendChild(wrapper);
+    scrollToBottom();
+  }
 
-    answerElement.appendChild(cursor);
-}
+  function createAssistantCard() {
+    const wrapper = document.createElement("div");
+    wrapper.className = "message-wrapper assistant";
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-function parseEvent(rawEvent) {
-
-    const lines =
-        rawEvent.split("\n");
-
-    const eventLine =
-        lines.find(x =>
-            x.startsWith("event:"));
-
-    const dataLine =
-        lines.find(x =>
-            x.startsWith("data:"));
-
-    if (!eventLine || !dataLine)
-        return null;
-
-    return {
-        type:
-            eventLine.replace(
-                "event:",
-                "").trim(),
-
-        data:
-            dataLine.replace(
-                "data:",
-                "").trim()
-    };
-}
-
-function renderSources(
-    container,
-    retrieval) {
-
-    if (!retrieval)
-        return;
-
-    let html =
-        "<hr><h6>📚 Sources</h6>";
-
-    retrieval.Sources.forEach(source => {
-
-        html +=
-            `<span class="source-chip">
-                📄 ${source}
-             </span>`;
-    });
-
-    container.innerHTML = html;
-}
-
-function renderDiagnostics(
-    container,
-    retrieval,
-    completion) {
-
-    if (!retrieval || !completion)
-        return;
-
-    container.innerHTML =
-`
-<hr>
-
-<details>
-
-    <summary>
-        Diagnostics
-    </summary>
-
-    <div class="details-panel">
-
-        <div class="metric-grid">
-
-            <div class="metric">
-                Retrieval: ${retrieval.RetrievalMs} ms
-            </div>
-
-            <div class="metric">
-                Chunks: ${retrieval.ReturnedChunks}
-            </div>
-
-            <div class="metric">
-                Avg Score:
-                ${retrieval.AverageScore.toFixed(3)}
-            </div>
-
-            <div class="metric">
-                Max Score:
-                ${retrieval.HighestScore.toFixed(3)}
-            </div>
-
-            <div class="metric">
-                Generation:
-                ${completion.GenerationMs} ms
-            </div>
-
-            <div class="metric">
-                Total:
-                ${completion.TotalMs} ms
-            </div>
-
+    wrapper.innerHTML = `
+      <div class="assistant-card">
+        <div class="msg-meta">
+          <div class="assistant-identity">
+            <div class="assistant-avatar">🤖</div>
+            <span>RAG Assistant</span>
+          </div>
+          <span class="msg-timestamp">${now}</span>
         </div>
 
-    </div>
+        <div class="answer-content">
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
 
-</details>
-`;
-}
+        <div class="sources-slot"></div>
+        <div class="diagnostics-slot"></div>
+      </div>
+    `;
 
-function removeWelcomeMessage() {
+    chatContainer.appendChild(wrapper);
+    scrollToBottom();
 
-    const welcome =
-        document.querySelector(
-            ".welcome-message");
+    return {
+      wrapper,
+      answerEl: wrapper.querySelector(".answer-content"),
+      typingEl: wrapper.querySelector(".typing-dots"),
+      sourcesEl: wrapper.querySelector(".sources-slot"),
+      diagnosticsEl: wrapper.querySelector(".diagnostics-slot")
+    };
+  }
 
-    if (welcome) {
-        welcome.remove();
+  function updateStreamingAnswer(container, rawText) {
+    let cursor = container.querySelector(".streaming-cursor");
+    if (!cursor) {
+      cursor = document.createElement("span");
+      cursor.className = "streaming-cursor";
+      cursor.textContent = "▌";
     }
-}
 
-function scrollToBottom() {
+    container.textContent = rawText;
+    container.appendChild(cursor);
+  }
 
-    chatContainer.scrollTop =
-        chatContainer.scrollHeight;
-}
+  function renderSourcesList(container, retrieval) {
+    if (!retrieval || !retrieval.Sources || retrieval.Sources.length === 0) return;
 
-function escapeHtml(text) {
+    let html = `
+      <div class="sources-container">
+        <div class="sources-header">
+          <span>📚 Grounded Sources</span>
+          <span>(${retrieval.Sources.length} references)</span>
+        </div>
+        <div class="sources-list">
+    `;
 
-    const div =
-        document.createElement("div");
+    retrieval.Sources.forEach(src => {
+      html += `
+        <span class="source-tag">
+          <span>📄</span>
+          <span>${escapeHtml(src)}</span>
+        </span>
+      `;
+    });
 
-    div.textContent = text;
+    html += `</div></div>`;
+    container.innerHTML = html;
+  }
 
+  function renderDiagnosticsAccordion(container, retrieval, completion) {
+    if (!retrieval && !completion) return;
+
+    const retMs = retrieval ? `${retrieval.RetrievalMs} ms` : "--";
+    const genMs = completion ? `${completion.GenerationMs} ms` : "--";
+    const totalMs = completion ? `${completion.TotalMs} ms` : "--";
+    const avgScore = retrieval && retrieval.AverageScore ? retrieval.AverageScore.toFixed(3) : "--";
+    const maxScore = retrieval && retrieval.HighestScore ? retrieval.HighestScore.toFixed(3) : "--";
+    const chunks = retrieval ? retrieval.ReturnedChunks : "--";
+
+    container.innerHTML = `
+      <details class="diagnostics-accordion">
+        <summary>
+          <span>⚡ Turn Diagnostics &amp; Telemetry Breakdown</span>
+          <span>▼</span>
+        </summary>
+        <div class="diagnostics-panel">
+          <div class="diag-item">
+            <div class="label">Vector Retrieval</div>
+            <div class="val">${retMs}</div>
+          </div>
+          <div class="diag-item">
+            <div class="label">LLM Generation</div>
+            <div class="val">${genMs}</div>
+          </div>
+          <div class="diag-item">
+            <div class="label">End-to-End Latency</div>
+            <div class="val">${totalMs}</div>
+          </div>
+          <div class="diag-item">
+            <div class="label">Chunks Injected</div>
+            <div class="val">${chunks}</div>
+          </div>
+          <div class="diag-item">
+            <div class="label">Max Cosine Score</div>
+            <div class="val">${maxScore}</div>
+          </div>
+          <div class="diag-item">
+            <div class="label">Avg Cosine Score</div>
+            <div class="val">${avgScore}</div>
+          </div>
+        </div>
+      </details>
+    `;
+  }
+
+  function parseSseEvent(rawEvent) {
+    const lines = rawEvent.split("\n");
+    const eventLine = lines.find(x => x.startsWith("event:"));
+    const dataLine = lines.find(x => x.startsWith("data:"));
+
+    if (!eventLine || !dataLine) return null;
+
+    return {
+      type: eventLine.replace("event:", "").trim(),
+      data: dataLine.replace("data:", "").trim()
+    };
+  }
+
+  /**
+   * Lightweight Markdown Formatter
+   */
+  function formatMarkdown(text) {
+    if (!text) return "";
+    let safe = escapeHtml(text);
+
+    // Code blocks ```lang ... ```
+    safe = safe.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+      return `<pre><code class="language-${lang || 'text'}">${code.trim()}</code></pre>`;
+    });
+
+    // Inline code `code`
+    safe = safe.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Bold **text**
+    safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+    // Italic *text*
+    safe = safe.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+    // Bullet points
+    safe = safe.replace(/^\s*-\s+(.*)$/gm, '<li>$1</li>');
+    safe = safe.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+
+    // Line breaks to paragraphs
+    const paragraphs = safe.split(/\n\n+/);
+    return paragraphs.map(p => {
+      if (p.startsWith('<pre>') || p.startsWith('<ul>')) return p;
+      return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+    }).join('');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
     return div.innerHTML;
-}
+  }
 
-questionInput.focus();
+  function scrollToBottom() {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function setupTextareaAutoResize() {
+    if (!questionInput) return;
+    questionInput.style.height = 'auto';
+    questionInput.style.height = Math.min(questionInput.scrollHeight, 120) + 'px';
+  }
+
+  function getWelcomeHeroMarkup() {
+    return `
+      <div class="welcome-hero" id="welcomeHero">
+        <div class="hero-badge">Conversational RAG • Grounded First Principles</div>
+        <h2>Enterprise Knowledge Assistant</h2>
+        <p class="hero-desc">
+          Query the pre-indexed technical corpus (including <em>Attention Is All You Need</em>, <em>BERT Pretraining</em>, and <em>Language Models are Few-Shot Learners</em>). The assistant enforces strict boundary grounding, refusing to hallucinate when context is absent.
+        </p>
+
+        <div class="hero-specs-row">
+          <div class="spec-pill"><span>🏛️</span> Clean Architecture</div>
+          <div class="spec-pill"><span>🔢</span> nomic-embed-text (768 Dim)</div>
+          <div class="spec-pill"><span>📦</span> Qdrant Vector Collection</div>
+          <div class="spec-pill"><span>🧠</span> 4-Turn Rolling Memory</div>
+          <div class="spec-pill"><span>🛡️</span> Zero Hallucination Policy</div>
+        </div>
+
+        <div class="starter-prompts-section">
+          <div class="starter-header">Suggested Assessment &amp; Technical Queries:</div>
+          <div class="starter-grid">
+            <button class="prompt-chip" data-prompt="What is self-attention?">
+              <span class="chip-icon">🔹</span>
+              <span class="chip-text">What is self-attention?</span>
+            </button>
+            <button class="prompt-chip" data-prompt="Summarize the Transformer architecture.">
+              <span class="chip-icon">🏛️</span>
+              <span class="chip-text">Summarize the Transformer architecture.</span>
+            </button>
+            <button class="prompt-chip" data-prompt="What are the advantages of transformers over RNNs?">
+              <span class="chip-icon">⚡</span>
+              <span class="chip-text">What are advantages of transformers over RNNs?</span>
+            </button>
+            <button class="prompt-chip" data-prompt="Refusal Probe: What is the capital of France?">
+              <span class="chip-icon">🛡️</span>
+              <span class="chip-text">Refusal Probe: What is the capital of France?</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+})();
