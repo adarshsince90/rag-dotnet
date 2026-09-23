@@ -11,8 +11,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Studio Stylesheet -->
-  <link rel="stylesheet" href="/css/chat.css?v=1.1">
+  <!-- Studio Stylesheet (Relative path works both under server and direct file://) -->
+  <link rel="stylesheet" href="css/chat.css">
 </head>
 <body>
 
@@ -43,6 +43,9 @@
       <a href="/scalar/v1" target="_blank" rel="noopener" class="header-nav-link" title="Open OpenAPI Scalar Documentation">
         <span>📡</span> Scalar Specs
       </a>
+      <button class="action-btn theme-toggle-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+        🌙
+      </button>
       <button id="new-chat-btn" class="action-btn new-chat-btn" title="Reset Session and Start New Conversation">
         <span>🔄</span> New Chat
       </button>
@@ -159,6 +162,6 @@
     </div>
   </main>
 
-  <script src="/js/chat.js"></script>
+  <script src="js/chat.js"></script>
 </body>
 </html>

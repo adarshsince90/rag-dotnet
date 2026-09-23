@@ -22,6 +22,20 @@
   const conversationLabel = document.getElementById("conversationLabel");
   const apiStatusBadge = document.getElementById("apiStatusBadge");
   const apiStatusText = document.getElementById("apiStatusText");
+  const themeToggleBtn = document.getElementById("themeToggleBtn");
+
+  // Theme State
+  let currentTheme = localStorage.getItem("rag_chat_theme") || "dark";
+  document.documentElement.setAttribute("data-theme", currentTheme);
+  if (themeToggleBtn) {
+    themeToggleBtn.textContent = currentTheme === "dark" ? "🌙" : "☀️";
+    themeToggleBtn.addEventListener("click", () => {
+      currentTheme = currentTheme === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", currentTheme);
+      localStorage.setItem("rag_chat_theme", currentTheme);
+      themeToggleBtn.textContent = currentTheme === "dark" ? "🌙" : "☀️";
+    });
+  }
 
   // Telemetry HUD Elements
   const hudRetrievalMs = document.getElementById("hudRetrievalMs");
